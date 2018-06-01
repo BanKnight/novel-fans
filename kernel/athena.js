@@ -1,4 +1,10 @@
+const Koa = require("koa")
+const Router = require("koa-router")
+
 const server = {
+    app : new Koa(),
+    routers : Router(),
+    data : {},
     modules : {},
     sorted_mds :[]
 }
@@ -66,4 +72,11 @@ server.start_modules = async()=>
     }
 
     return true
+}
+
+server.start_routers = function()
+{
+    server.app
+        .use(server.routers.routes())
+        .use(server.routers.allowedMethods())
 }

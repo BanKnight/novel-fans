@@ -1,0 +1,39 @@
+const helmet = require('koa-helmet')
+const limit = require('koa-limit')
+const convert = require('koa-convert')
+
+const server = global.server
+const app = server.app
+const routers = server.routers
+
+routers.use(async (ctx,next)=>
+{
+    console.log(`Process ${ctx.req.method} ${ctx.req.url}`);
+        
+    await next()
+})
+
+routers.use(async(ctx,next)=>
+{
+    ctx.state = server.data
+
+    console.log(`state routers`);
+
+    await next()
+})
+
+
+
+routers.use(convert(limit({
+    limit: 1000,
+    interval: 1000 * 60
+  })))
+
+
+routers.use(helmet.noCache())           //浏览器不要缓存
+routers.use(helmet.noSniff())           
+routers.use(helmet.frameguard())         
+routers.use(helmet.xssFilter())         
+routers.use(helmet.hidePoweredBy())     //      删除了 header 中的 X-Powered-By 标签
+routers.use(helmet.ieNoOpen())
+

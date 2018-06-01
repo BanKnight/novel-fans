@@ -12,6 +12,13 @@ const web_site = {}
 me.start = async function()
 {
 
+    if(true)
+    {
+        // console.dir(book)
+
+        return true
+    }
+
     assert(web_site)
 
     setTimeout(async()=>
@@ -25,12 +32,7 @@ me.start = async function()
     },100)
 
 
-    if(true)
-    {
-        // console.dir(book)
 
-        return true
-    }
 
     await web_site.fetch_catalog(book)
     await web_site.fetch_catalog(book)

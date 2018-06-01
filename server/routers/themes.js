@@ -1,0 +1,56 @@
+const path = require("path")
+const assert = require("assert")
+const moment = require("moment")
+const static = require("koa-static-cache")
+
+const LRU = require('lru-cache')
+
+const render = require("../../kernel/views")
+const template = render.template
+
+const configs = global.configs
+const server = global.server
+const app = server.app
+const routers = server.routers
+
+//添加 moment plugin
+template.defaults.imports.moment = function(content,format_str)
+{
+    return moment(content).format(format_str)
+}
+
+let views_path = path.resolve(config.content,"themes",config.theme || "default")
+
+{
+    let admin_path = path.resolve("admin")
+
+    console.log(`views path is ${views_path}`)
+
+    render(app, {
+        pathes: [views_path],
+        extname: '.art',
+        debug: process.env.NODE_ENV !== 'production'
+    })
+}
+
+{//theme static
+    const files = new LRU({ max: 1000 })
+
+    let theme = path.resolve(views_path,"public")
+    
+    app.use(static(theme,{prefix:"/public/",buffer:true,gzip:true,dynamic:true,files:files}))
+}
+if(process.env != "production")
+{//admin static
+    const files = new LRU({ max: 1000 })
+
+    let admin_static = path.resolve(views_path,"labs")
+    
+    app.use(static(admin_static,{prefix:"/labs/",buffer:true,gzip:true,dynamic:true,files:files}))
+}
+
+routers.get("/",async(ctx,next)=>
+{
+    ctx.body = "hello world"
+})
+

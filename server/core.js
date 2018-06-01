@@ -1,4 +1,7 @@
-const server = require("../kernel/athena")
+const server = global.server
+const config = global.config
+
+const app = server.app
 
 server.start = async function()
 {
@@ -8,6 +11,12 @@ server.start = async function()
     {
         return false
     }
+
+    server.start_routers()
+
+    app.listen(config.port)
+
+    console.log(`listening at ${config.port}`)
 
     return true
 }

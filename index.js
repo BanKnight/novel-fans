@@ -1,11 +1,10 @@
 const Koa = require("koa")
 const Router = require("koa-router")
 
+require("./config")
 require("./kernel/utils")
 
 const server = global.server = require("./kernel/athena")
-
-// server.app = new Koa()
 
 require("./server")
 
@@ -16,8 +15,6 @@ async function start()
         console.log("start server error")
     }
 }
-
-console.log("start now")
 
 start()
 

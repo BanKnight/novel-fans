@@ -1,0 +1,25 @@
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>{{title}}</title>
+
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+
+    <link rel="stylesheet" href="https:///cdn.bootcss.com/normalize/8.0.0/normalize.min.css">
+	<link rel="stylesheet" href="https:///cdn.bootcss.com/pure/1.0.0/pure-min.css">
+	<link rel="stylesheet" href="https:///cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css">
+
+    <link rel="stylesheet" href="/public/weuix.min.css">
+    <script src="/public/zepto.min.js"></script>
+
+</head>
+
+<body class="page-bg">
+
+
+
+</body>
+
+</html>
