@@ -42,11 +42,27 @@ let views_path = path.resolve(config.content,"themes",config.theme || "default")
 }
 if(process.env != "production")
 {//admin static
-    const files = new LRU({ max: 1000 })
 
-    let admin_static = path.resolve(views_path,"labs")
+    // const files = new LRU({ max: 1000 })
+
+    const fs = require("fs")
+
+    let labs_path = path.resolve(views_path,"labs")
+
+    routers.get("/labs/:file",async(ctx,next)=>
+    {
+        let real_file = path.resolve(labs_path,ctx.params.file)
+        if(fs.existsSync(real_file))
+        {
+            ctx.body = fs.readFileSync(real_file)
+            ctx.set("Content-Type", "text/html; charset=utf-8")
+        }
+        else{
+            console.log(`${real_file} is not exists`)
+        }
+    })
     
-    app.use(static(admin_static,{prefix:"/labs/",buffer:true,gzip:true,dynamic:true,files:files}))
+    // app.use(static(admin_static,{prefix:"/labs/",buffer:true,gzip:true,dynamic:true}))
 }
 
 routers.get("/",async(ctx,next)=>
