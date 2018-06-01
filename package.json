@@ -1,0 +1,40 @@
+{
+  "name": "novel-fans",
+  "version": "0.0.1",
+  "description": "a crawler for my own novels interest",
+  "main": "index.js",
+  "scripts": {
+    "test": "cross-env NODE_ENV=development node index.js"
+  },
+  "keywords": [
+    "novel",
+    "crawler"
+  ],
+  "author": "bansky",
+  "license": "MIT",
+  "dependencies": {
+    "art-template": "^4.12.2",
+    "cheerio": "^1.0.0-rc.2",
+    "cross-env": "^5.1.5",
+    "debug": "^3.1.0",
+    "highlight.js": "^9.12.0",
+    "koa": "^2.5.1",
+    "koa-bodyparser": "^4.2.0",
+    "koa-compose": "^4.0.0",
+    "koa-compress": "^3.0.0",
+    "koa-handle-error": "0.0.5",
+    "koa-helmet": "^4.0.0",
+    "koa-router": "^7.4.0",
+    "koa-session-minimal": "^3.0.4",
+    "koa-static-cache": "^5.1.2",
+    "lru-cache": "^4.1.3",
+    "markdown-it": "^8.4.1",
+    "moment": "^2.22.1",
+    "mongodb": "^3.0.8",
+    "nodemailer": "^4.6.5",
+    "phantomjs": "^2.1.7",
+    "phantomjs-prebuilt": "^2.1.16",
+    "request": "^2.87.0",
+    "uuid": "^3.2.1"
+  }
+}
