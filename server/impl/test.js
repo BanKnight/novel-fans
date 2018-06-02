@@ -2,158 +2,150 @@ const fs = require("fs")
 const cheerio = require("cheerio")
 const assert = require("assert")
 
+const md_tasks = server.get("tasks")
+const md_crawler = server.get("crawler")
+
 const me = server.get("test")
 const data = me.data
 
-const md_crawler = server.get("crawler")
 
 const web_site = {}
 
-me.start = async function()
-{
-
-    if(true)
-    {
-        // console.dir(book)
-
-        return true
-    }
-
-    assert(web_site)
-
-    setTimeout(async()=>
-    {
-        let infos = await web_site.search("修真聊天群")
-
-        let book = infos[0]
-
-        await web_site.fetch(book)
-
-    },100)
-
-
-
-
-    await web_site.fetch_catalog(book)
-    await web_site.fetch_catalog(book)
-    // await web_site.fetch_content(book)
-
-    web_site.update(book)
-
- 
-
-    // async function load_page(url)
-    // {
-    //     console.log("loading url:" + url)
-
-    //     let dom = await JSDOM.fromURL(url, options)
-
-    //     return dom.window
-    // }
-
-    // async function load_body(url)
-    // {
-    //     console.log("loading url:" + url)
-
-    //     let dom = await JSDOM.fromURL(url, options)
-
-    //     return dom.window.document.body
-    // }
-
-    // let web_site = "https://yd.sogou.com"
-
-    // let book_name = "修真聊天群"
-
-    // let books = {}
-
-    // {
-
-    //     /*
-    //     搜索：https://yd.sogou.com/h5/search?query=修真聊天群，获取书的索引 bkey
-    //     书的主页：https://yd.sogou.com/h5/cpt/detail?bkey=DFFBD9CAEDA706297C4264E7C7AD4D86
-    //     目录获取：post : https://yd.sogou.com/h5/cpt/ajax/detail，formdata :{bkey : 上面的bkey,p:页码,asc:排序}
-    //     https://yd.sogou.com/h5/cpt/chapter?bkey=DFFBD9CAEDA706297C4264E7C7AD4D86&ckey=9ACFA318977018F62E39947CAD27B9CD
-    //     */
-
-    //     //wap.sogou.com/web/searchList.jsp?keyword=修真聊天群
-    //     //http://k.sogou.com/vrtc/list?me=4045444364269123262
-
-    //     let document = await load_body(`${web_site}/0_0_0_0_heat/?keyword=${book_name}`)
-
-    //     // console.log(document.body.innerHTML)
-
-    //     // 注意 如果有和搜索的名字一致的话 就会出现 mark 标签
-    //     let pages = document.querySelectorAll(".fl .clear")
-
-    //     for(var i = 0,len = pages.length;i < len;++i)
-    //     {
-    //         let this_book = pages[i]
-    //         let book = {}
-
-    //         book.url = this_book.getAttribute("href")
-    //         book.title = this_book.querySelector(".book-title").innerHTML
-    //         // book.desc = this_book.querySelector(".book-desc").innerHTML
-
-    //         books[book.title] = book
-
-    //         break
-    //     }
-
-    // }
-
-    // for(let title in books)
-    // {
-    //     let book = books[title]
-
-    //     let page = await load_body(`${web_site}${book.url}`)
-
-    //     book.catalog_url = page.querySelector(".book-status").getAttribute("href")
-    // }
-
-    // for(let title in books)
-    // {
-    //     let book = books[title]
-
-    //     let page = await load_page(`${web_site}${book.catalog_url}`)
-
-    //     page.eval(`document.body.innerHTML = window.g_data.volumes`)
-
-    //     // if(page.g_data)
-    //     // {
-    //     //     console.log("got it")
-
-    //     //     fs.writeFileSync("./page.html",page.document.documentElement.outerHTML)
-    //     // }
-
-    //     page = page.document.body
-
-    //     console.log(page.innerHTML)
-
-    //     let chapters_html = page.querySelectorAll(".chapter-li-a ")
-
-    //     // console.log(page.innerHTML)
-    //     console.log("there are :" + chapters_html.length)
-
-    //     book.chapters = []
-
-    //     for(let i = 0,len = chapters_html.length;i < len;++i)
-    //     {
-    //         let chapter_html = chapters_html[i]
-    //         let chapter = {}
-
-    //         chapter.title = chapter_html.querySelector(".chapter-index ").innerHTML
-    //         chapter.url = chapter_html.getAttribute("href")
-
-    //         book.chapters.push(chapter)
-
-    //         console.dir(chapter)
-
-    //         break
-    //     }
-    // }
-    // // console.dir(books)
+me.start = async function () {
+    server.run_after(1000, async () => {
+        console.log("begin test")
+        me.test_search_book()
+    })
 
     return true
+}
+
+me.test_search_book = async () => {
+    // me.test_task()
+    // me.test_request()
+    me.test_my_request()
+}
+
+me.test_my_request = ()=>
+{
+    let request = require("../../kernel/request")
+    let count = 0
+
+    let request_catalog = (curr_page)=>
+    {
+        if(curr_page > 30)
+        {
+            return
+        }
+
+        console.log("before request")
+
+        request.get({url : "https://yd.sogou.com/h5/cpt/ajax/detail",qs:
+            {
+                bkey: 'DFFBD9CAEDA706297C4264E7C7AD4D86', p: curr_page, asc: "asc" 
+            }},
+            (error, response, body) => {
+                if (error) {
+                    console.log(`got an error : ${error}`)
+                                    
+                    request_catalog(curr_page)
+
+                    return
+                }
+                if (response.statusCode != 200) {
+                    console.log("error")
+                    return
+                }
+
+                // console.log(body)
+
+                count ++
+
+                let info = JSON.parse(body)
+
+                console.log(`get ${info.list.curPage},count : ${count}`)
+
+                request_catalog(++curr_page)
+            })
+        
+    }
+
+    request.get({url : "https://yd.sogou.com/h5/search",qs : { query: "修真聊天群" } }, (err,resp,body) => {
+
+        // console.log("finish search:" + body)
+
+        fs.writeFileSync("search.html",body)
+
+        for(var i = 1; i <= 1;++i)
+        {
+            request_catalog(i)
+        }
+
+    })
+}
+
+me.test_task = async() => {
+    let book = await md_tasks.search("修真聊天群")
+}
+
+me.test_request = () => {
+
+    let request = require("request")
+    let count = 0
+
+    let request_catalog = (curr_page)=>
+    {
+        if(curr_page > 30)
+        {
+            return
+        }
+
+        console.log("before request")
+
+        request.get({url :"https://yd.sogou.com/h5/cpt/ajax/detail",params:
+            {
+                qs: { bkey: 'DFFBD9CAEDA706297C4264E7C7AD4D86', p: curr_page, asc: "asc" },
+                gzip: true,
+                timeout: 3000,
+                keepAlive : false,
+            }},
+            (error, response, body) => {
+                if (error) {
+                    console.log(`got an error : ${error}`)
+                                    
+                    request_catalog(curr_page)
+
+                    return
+                }
+                if (response.statusCode != 200) {
+                    console.log("error")
+                    return
+                }
+
+                count ++
+
+                let info = JSON.parse(body)
+
+                console.log(`get ${info.list.curPage},count : ${count}`)
+
+                request_catalog(++curr_page)
+            })
+        
+    }
+
+    request.get({url : "https://yd.sogou.com/h5/search"}, () => {
+
+        console.log("finish search")
+
+        for(var i = 1; i <= 1;++i)
+        {
+            request_catalog(i)
+        }
+
+    })
+
+
+
 }
 
 web_site.name = "sogou"
@@ -165,77 +157,67 @@ web_site.headers = {
 }
 
 //https://yd.sogou.com/h5/search?query=修真聊天群
-web_site.search = async function(name)
-{
-    let books = []
+web_site.search = async function (name) {
+    let body = await md_crawler.get("sogou", `${this.url}/h5/search`, { query: name })
 
-    let body = await md_crawler.get("sogou",`${this.url}/h5/search`,{query : name})
+    fs.writeFileSync("search.html", body)
 
-    fs.writeFileSync("search.html",body)
-
-    let $ = cheerio.load(body,{decodeEntities: false})
+    let $ = cheerio.load(body, { decodeEntities: false })
     let result_html = $(".result-wrap-match")
 
-    let title_html = $("em",".result-title",result_html)
-    let author_html = $("strong",".result-author",result_html)
-    let summary_html = $(".result-summary",result_html)
+    let title_html = $("em", ".result-title", result_html)
+    let author_html = $("strong", ".result-author", result_html)
+    let summary_html = $(".result-summary", result_html)
 
     let book = {
-        from : web_site.name,
-        bkey : result_html.attr("bkey"),
-        title : title_html.html(),
-        author : author_html.html(),
-        summary : summary_html.html(),
+        from: web_site.name,
+        bkey: result_html.attr("bkey"),
+        title: title_html.html(),
+        author: author_html.html(),
+        summary: summary_html.html(),
     }
 
-    books.push(book)
-
-    return books
+    return book
 }
 
 //目录获取：post : https://yd.sogou.com/h5/cpt/ajax/detail，formdata :{bkey : 上面的bkey,p:页码,asc:排序 / desc}
-web_site.fetch = async function(book)
-{
+web_site.fetch = async function (book) {
     let that = this
 
     let options = {
-        url : `${that.url}/h5/cpt/ajax/detail`,
-        headers : this.headers,
+        url: `${that.url}/h5/cpt/ajax/detail`,
+        headers: this.headers,
     }
 
     let url = `${that.url}/h5/cpt/ajax/detail`
 
     book.chapters = []
 
-    let parse_page = function(items)
-    {
-        for(let i = 0,len = items.length;i < len;++i)
-        {
+    let parse_page = function (items) {
+        for (let i = 0, len = items.length; i < len; ++i) {
             let item = items[i]
 
             book.chapters.push({
-                ckey : item.ckey,
-                name : item.name,
-                index : item.index,
-                update : item.updateTime,
+                ckey: item.ckey,
+                name: item.name,
+                index: item.index,
+                update: item.updateTime,
             })
         }
 
         console.log(`add ${items.length},total size:${book.chapters.length}`)
     }
 
-    let curr_page = 0,total_pages = 100
+    let curr_page = 0, total_pages = 100
 
-    for(let i = 0;i < 1000;++i)
-    {
-        curr_page ++
+    for (let i = 0; i < 1000; ++i) {
+        curr_page++
 
-        if(curr_page > total_pages)
-        {
+        if (curr_page > total_pages) {
             break
         }
 
-        let body = await md_crawler.post("sogou",url,{bkey:book.bkey,p : curr_page,asc:"asc"})
+        let body = await md_crawler.post("sogou", url, { bkey: book.bkey, p: curr_page, asc: "asc" })
 
         let info = JSON.parse(body)
 
@@ -250,48 +232,41 @@ web_site.fetch = async function(book)
 
     }
 
-    try
-    {
+    try {
         fs.mkdirSync("./novels")
     }
-    catch(err)
-    {
+    catch (err) {
 
     }
 
     let folder = `./novels/${book.title}`
 
-    try
-    {
+    try {
         fs.mkdirSync(folder)
     }
-    catch(err)
-    {
+    catch (err) {
 
     }
 
     //https://yd.sogou.com/h5/cpt/chapter?
-    for(let i = 0,len = book.chapters.length;i < len;++i)
-    {
+    for (let i = 0, len = book.chapters.length; i < len; ++i) {
         let chapter = book.chapters[i]
 
-        if(chapter.content)
-        {
+        if (chapter.content) {
             continue
         }
 
-        let html = await md_crawler.get("sougo",`${that.url}/h5/cpt/chapter`,{bkey : book.bkey,ckey : chapter.ckey})
+        let html = await md_crawler.get("sougo", `${that.url}/h5/cpt/chapter`, { bkey: book.bkey, ckey: chapter.ckey })
 
-        let $ = cheerio.load(html,{decodeEntities: false})
+        let $ = cheerio.load(html, { decodeEntities: false })
 
         let text_html = $("#text")
 
         chapter.content = text_html.html()
 
-        fs.writeFileSync(`${folder}/${chapter.name}.html`,chapter.content)
+        fs.writeFileSync(`${folder}/${chapter.name}.html`, chapter.content)
 
-        if(i % 10 == 0)
-        {
+        if (i % 10 == 0) {
             console.log("has already write:" + i)
         }
 

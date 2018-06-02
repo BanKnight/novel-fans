@@ -1,6 +1,5 @@
 const server = global.server
 const me = server.get("locks")
-const 
 const data = me.data
 
 me.lock = async(name)=>

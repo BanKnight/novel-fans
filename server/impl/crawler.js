@@ -1,8 +1,6 @@
 const fs = require("fs")
-const request = require("request")
+const request = require("../../kernel/request")
 const assert = require("assert")
-
-const md_timers = server.get("timers")
 
 const me = server.get("crawler")
 const data = me.data
@@ -12,12 +10,14 @@ const queues = data.queues
 me.start = async()=>
 {
     data.headers = {
-        'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36",
-        'Content-Language': 'zh-CN',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36',        
         'Content-Type': 'text/html; charset=utf-8',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Encoding': 'deflate',
+        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
     }
 
-    md_timers.run_revery(80,160,me.update)
+    server.run_revery(80,160,me.update)
 
     return true
 }
@@ -54,8 +54,6 @@ me.update_one_queue = function(source,queue)
 
 me.do_task = (source,task)=>
 {
-    // console.dir(task)
-
     if(task.method == "get")
     {
         me.do_get_task(source,task)
@@ -71,17 +69,29 @@ me.do_get_task = (source,task)=>
     let options = {
         url : task.url,
         qs: task.data,
-        headers : data.headers,
+        timeout: 300,
+        // gzip : true,
+        // headers : data.headers,
     }
+
+    console.log(`requesting get task ${task.url}`)
+    console.dir(options.qs)
 
     request.get(options,function(error, response, body)
     {
+        console.log(`get cb ${task.url}`)
+
         let is_ok = true
         if(error || response.statusCode != 200)
         {
             console.log(error)
 
-            queues[source].push(task)
+            server.run_after(3000,()=>
+            {
+                queues[source].push(task)
+
+            })
+
             return
         }
 
@@ -94,15 +104,28 @@ me.do_post_task = (source,task)=>
     let options = {
         url : task.url,
         form: task.data,
-        headers : data.headers,
+        gzip:true,
+        timeout: 3000,
+        // headers : data.headers,
     }
+
+    console.log(`requesting post task ${task.url}`)
 
     request.post(options,function(error, response, body)
     {
+        console.log(`post cb ${task.url}`)
+
         let is_ok = true
         if(error || response.statusCode != 200)
         {
-            console.log(error)
+            if(error)
+            {
+                console.log(error)
+            }
+            else
+            {
+                console.log("status is not 200")
+            }
 
             queues[source].push(task)
             return
@@ -133,7 +156,7 @@ me.post_async = (source,info)=>
         cb : info.cb,
     })
 
-    console.log(`add a new post task ${queue.length}`)
+    // console.log(`add a new post task ${info.url}`)
 }
 
 me.get_async = (source,info,cb)=>
@@ -152,7 +175,7 @@ me.get_async = (source,info,cb)=>
         cb : info.cb,
     })
 
-    console.log(`add a new post task ${queue.length}`)
+    // console.log(`add a new get task ${info.url}`)
 }
 
 me.post = async(source,url,data)=>

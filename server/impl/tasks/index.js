@@ -10,13 +10,15 @@ const md_crawler = server.get("crawler")
 const md_locks = server.get("locks")
 const md_logs = server.get("logs")
 
-
 const me = server.get("tasks")
 const subs = me.subs
 const data = me.data
 
 me.start = async()=>
 {
+
+    console.log("start tasks!!!")
+
     server.run_every(2 * 60 * 1000,me.update)
 
     const blacks = ['index']
@@ -28,9 +30,10 @@ me.start = async()=>
         father : this,
         crawler : md_crawler,
         cheerio : require("cheerio"),
+        logs : md_logs,
     }
 
-    for(let i = 0, len = file_or_folders;i < len;++i)
+    for(let i = 0, len = file_or_folders.length;i < len;++i)
     {
         let element = file_or_folders[i]
 
@@ -38,6 +41,8 @@ me.start = async()=>
         if(blacks.includes(base_name) == false)
         {
             let sub = require(path.join(__dirname,base_name))
+
+            console.log("require sub:" + base_name)
 
             sub.name = base_name
 
@@ -63,8 +68,11 @@ me.search = async(book_name)=>
 
     if(is_lock !== true)
     {
+        md_logs.add(`${book_name} is already added to the searching task`)
         return is_lock
     }
+
+    md_logs.add(`new searching task:${book_name}`)
 
     let tasks = []
 
@@ -79,6 +87,8 @@ me.search = async(book_name)=>
     }
 
     let books = await Promise.all(tasks)
+
+    md_logs.add(`${book_name} all searching task done`)
 
     let the_best_book
 

@@ -12,14 +12,14 @@ module.exports = server
 
 //--------------------------------
 
-server.new = function(info)
+server.new = function(name,info)
 {
 
     info.data = info.data || {}
 
     server.modules[name] = info
 
-    return md
+    return info
 }
 
 server.get = function(name)
