@@ -2,7 +2,9 @@ const fs = require("fs")
 const request = require("request")
 const assert = require("assert")
 
-const me = server.get("loader")
+const md_timers = server.get("timers")
+
+const me = server.get("crawler")
 const data = me.data
 
 const queues = data.queues
@@ -15,30 +17,19 @@ me.start = async()=>
         'Content-Type': 'text/html; charset=utf-8',
     }
 
-    // setInterval(me.update,rand(80,150))
-
-    setTimeout(me.update,rand(80,160))
+    md_timers.run_revery(80,160,me.update)
 
     return true
 }
 
 me.update = function()
 {
-    setTimeout(me.update,rand(80,160))
-
     for(let source in queues)
     {
         let queue = queues[source]
 
         me.update_one_queue(source,queue)
     }
-}
-
-me.rand_update = function()
-{
-    setTimeout(me.rand_update,rand(100,200))
-
-
 }
 
 me.update_one_queue = function(source,queue)

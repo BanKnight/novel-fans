@@ -12,14 +12,12 @@ module.exports = server
 
 //--------------------------------
 
-server.new = function(name,data,priority)
+server.new = function(info)
 {
-    let md = {
-        data : data || {},
-        priority : priority
-    }
 
-    server.modules[name] = md
+    info.data = info.data || {}
+
+    server.modules[name] = info
 
     return md
 }

@@ -13,6 +13,6 @@ file_or_folders.forEach(element => {
     {
         let module_info = require(path.join(__dirname,base_name))
 
-        server.new(base_name,module_info.data,module.priroty)
+        server.new(module_info)
     }
 });

@@ -5,7 +5,7 @@ const assert = require("assert")
 const me = server.get("test")
 const data = me.data
 
-const md_loader = server.get("loader")
+const md_crawler = server.get("crawler")
 
 const web_site = {}
 
@@ -169,7 +169,7 @@ web_site.search = async function(name)
 {
     let books = []
 
-    let body = await md_loader.get("sogou",`${this.url}/h5/search`,{query : name})
+    let body = await md_crawler.get("sogou",`${this.url}/h5/search`,{query : name})
 
     fs.writeFileSync("search.html",body)
 
@@ -235,7 +235,7 @@ web_site.fetch = async function(book)
             break
         }
 
-        let body = await md_loader.post("sogou",url,{bkey:book.bkey,p : curr_page,asc:"asc"})
+        let body = await md_crawler.post("sogou",url,{bkey:book.bkey,p : curr_page,asc:"asc"})
 
         let info = JSON.parse(body)
 
@@ -280,7 +280,7 @@ web_site.fetch = async function(book)
             continue
         }
 
-        let html = await md_loader.get("sougo",`${that.url}/h5/cpt/chapter`,{bkey : book.bkey,ckey : chapter.ckey})
+        let html = await md_crawler.get("sougo",`${that.url}/h5/cpt/chapter`,{bkey : book.bkey,ckey : chapter.ckey})
 
         let $ = cheerio.load(html,{decodeEntities: false})
 
