@@ -167,7 +167,7 @@ web_site.search_chapters = async(book,start,stop)=>
 
         if(i % 50 == 0)
         {
-            web_site.logs.add(`[${web_site.name}]fetching content ${book.name},count : ${i},chapter:${chapter.name}`)
+            web_site.logs.add(`[${web_site.name}]fetching content ${book.name},count : ${i} / ${book.count},chapter:${chapter.name}`)
         }
     }
 }
