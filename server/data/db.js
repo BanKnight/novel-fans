@@ -1,7 +1,7 @@
 let md_info = {
     data : {
     },
-    prority : 100,
+    priority : 100,
 }
 
 module.exports = md_info
