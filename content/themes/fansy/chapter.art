@@ -1,0 +1,74 @@
+{{extend './layouts/main.art'}}
+
+{{block 'bar_head'}}
+<div class="weui_btn_default weui-header ">
+    <div class="weui-header-left">
+        <a class="icon icon-109 f-black" href="javascript:history.back()"></a>
+    </div>
+    <h1 class="weui-header-title f-black">{{book.name}}</h1>
+</div>
+{{/block}} {{block 'bar_body'}}
+
+<div class="weui-weixin-page">
+    <h2 class="weui-weixin-title">{{chapter.name}}</h2>
+    <div class="weui-weixin-content">
+        {{@chapter.content}}
+        <br>
+    </div>
+</div>
+
+{{/block}} {{block 'bar_footer'}}
+
+    {{set older = index - 1}}
+    {{set newer = 1 + index}}
+
+    {{if older >= 0}}
+    <a href="/chapter/{{book.name}}/{{older}}" class="weui_tabbar_item">
+        <div class="weui_tabbar_icon">
+            <img src="/public/img/icon_nav_cell.png" alt="">
+        </div>
+        <p class="weui_tabbar_label">上一章</p>
+    </a>
+    {{else}}
+        <a href="javascript:;" class="weui_tabbar_item">
+            <div class="weui_tabbar_icon">
+                <img src="/public/img/icon_nav_cell.png" alt="">
+            </div>
+            <p class="weui_tabbar_label">上一章(无)</p>
+        </a>
+    {{/if}}
+    <a href="javascript:;" class="weui_tabbar_item">
+        <div class="weui_tabbar_icon">
+            <img src="/public/img/icon_nav_button.png" alt="">
+        </div>
+        <p class="weui_tabbar_label">夜间</p>
+    </a>
+    <a href="/catalog/{{book.name}}" class="weui_tabbar_item">
+        <div class="weui_tabbar_icon">
+            <img src="/public/img/icon_nav_article.png" alt="">
+        </div>
+        <p class="weui_tabbar_label">目录</p>
+    </a>
+    <a href="/" class="weui_tabbar_item">
+        <div class="weui_tabbar_icon">
+            <img src="/public/img/icon_nav_cell.png" alt="">
+        </div>
+        <p class="weui_tabbar_label">书架</p>
+    </a>
+
+    {{if newer < book.count}}
+    <a href="/chapter/{{book.name}}/{{newer}}" class="weui_tabbar_item">
+        <div class="weui_tabbar_icon">
+            <img src="/public/img/icon_nav_cell.png" alt="">
+        </div>
+        <p class="weui_tabbar_label">下一章</p>
+    </a>
+    {{else}}
+        <a href="javascript:;" class="weui_tabbar_item">
+            <div class="weui_tabbar_icon">
+                <img src="/public/img/icon_nav_cell.png" alt="">
+            </div>
+            <p class="weui_tabbar_label">下一章(无)</p>
+        </a>    
+    {{/if}}
+{{/block}}

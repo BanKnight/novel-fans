@@ -23,7 +23,9 @@ me.start = async()=>
         data.id_helper = Math.max(data.id_helper,db_one_data._id)
     }
 
-    console.log(`has alread load ${db_data.length} log`)
+    console.log(`has alread load ${data.items.length} log`)
+
+    console.dir(data.items)
 
     return true
 }
@@ -59,5 +61,10 @@ me.add = (content)=>
     }
 
     console.log(content)
+}
+
+me.get_all = ()=>
+{
+    return data.items
 }
 

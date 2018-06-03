@@ -13,8 +13,9 @@ me.start = async()=>
 {
     let db_data = await md_db.load("basic")
 
-    for(let db_one_data in db_data)
+    for(let i = 0,len = db_data.length;i < len;++i)
     {
+        let db_one_data = db_data[i]
         let book = {
             name : db_one_data._id,
             author : db_one_data.author,
@@ -27,6 +28,8 @@ me.start = async()=>
         }
 
         data[book.name] = book
+
+        // console.dir(book)
     }
 
     console.log(`has ready load ${db_data.length} books`)
@@ -35,8 +38,9 @@ me.start = async()=>
 
     db_data = await md_db.load("chapter")
 
-    for(let db_one_data in db_data)
+    for(let i = 0,len = db_data.length;i < len;++i)
     {
+        let db_one_data = db_data[i]
         let book = data[db_one_data.book]
         if(book == null)
         {

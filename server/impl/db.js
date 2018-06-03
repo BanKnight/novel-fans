@@ -35,6 +35,7 @@ me.load = async(name,cond,fields)=>
         assert(data.db)
 
         cond = cond || {}
+        fields = fields || {}
 
         const col = data.db.collection(name)
         const ret = await col.find(cond).toArray()

@@ -1,0 +1,6 @@
+<a href="/catalog/{{name}}">
+    <div class="weui_media_box weui_media_text">
+        <h4 class="weui_media_title">{{name}}</h4>
+        <p class="weui_media_desc">{{summary}}</p>
+    </div>
+</a>
