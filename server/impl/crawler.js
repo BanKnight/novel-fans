@@ -86,7 +86,7 @@ me.do_get_task = (source,task)=>
         {
             console.log(error)
 
-            if(task.try < 3)
+            if(task.try < 30)
             {
                 queues[source].push(task)
             }
