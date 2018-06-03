@@ -4,6 +4,7 @@ const routers = server.routers
 
 const md_books = server.get("books")
 const md_logs = server.get("logs")
+const md_tasks = server.get("tasks")
 
 routers.get("/",async(ctx,next)=>
 {
@@ -65,3 +66,38 @@ routers.get("/logs",async(ctx,next)=>
     ctx.render("logs",info)
 })
 
+routers.post("/search",async(ctx,next)=>
+{
+    let params = ctx.request.body
+    let book_name = params.keyword
+
+    console.log("get a searching task : " + book_name)
+
+    if(md_books.get(book_name))
+    {
+        ctx.body = {is_ok : true ,msg : "这本书已经存在"}
+    }
+    else
+    {
+        ctx.body = {is_ok : true ,msg : "这本书正在后台收录中"}
+
+        setImmediate(()=>
+        {
+            md_logs.add('${book_name} searching')
+
+            let book = md_task.search(book_name)
+            if(book == null)
+            {
+                md_logs.add('searching ${book_name} failed')
+            }
+            else
+            {
+                if(md_books.get(book_name) == null)
+                {
+                    md_logs.add('searching ${book_name} ok')
+                }
+            }
+        })
+    }
+
+})

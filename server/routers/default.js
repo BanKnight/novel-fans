@@ -36,3 +36,7 @@ routers.use(helmet.xssFilter())
 routers.use(helmet.hidePoweredBy())     //      删除了 header 中的 X-Powered-By 标签
 routers.use(helmet.ieNoOpen())
 
+var bodyParser = require('koa-bodyparser')
+
+routers.use(bodyParser())
+

@@ -1,36 +1,41 @@
-{{extend './layouts/main.art'}}
+{{extend './layouts/main.art'}} {{block 'bar_body'}}
+<div class="weui_panel weui_panel_access">
 
-{{block 'bar_body'}}
-    <div class="weui_panel weui_panel_access">
-        <div class="weui_search_bar">
-                <form class="weui_search_outer">
-                    <div class="weui_search_inner">
-                        <i class="weui_icon_search"></i>
-                        <input type="search" class="weui_search_input" id="weui_search_input" placeholder="关键字" required="">
-                        <a href="javascript:" class="weui_icon_clear"></a>
-                    </div>
-                    <label for="weui_search_input" class="weui_search_text" style="transform-origin: 0px 0px 0px; opacity: 1; transform: scale(1, 1); display: none;">
-                        <i class="weui_icon_search"></i>
-                        <span>关键字</span>
-                    </label>
-                </form>
-                <a href="javascript:" class="weui_search_cancel">取消</a>
-            </div>
-            <div class="weui_panel_bd">
-                {{each books book name}}
-                    {{include './partials/book_card.art' book}}
-                {{/each}}
-            </div>
-
+    <div class="weui_search_bar">
+        <input type="search" id="search_content" name="search" class="search-input" id="search" placeholder="关键字" style="box-sizing:content-box">
+        <button class="weui_btn weui_btn_mini weui_btn_primary" onclick="search()">
+            <i class="icon icon-4"></i>
+        </button>
     </div>
 
-
-{{/block}}
-
-{{block 'page_footer'}}
-
     <script>
-        turn_bar_on("books")
+        function search()
+        {
+            let content = $("#search_content").val()
+            
+            $.post({
+                url : "/search",
+                dataType: 'json',
+                data : {keword : content},
+                success:function(data){
+                    $.toast(`操作成功`)
+                },
+                error:function(e){                    
+                    $.toast("操作失败","cancle")
+                }
+            })
+
+        }
     </script>
 
-{{/block}}
+    <div class="weui_panel_bd">
+        {{each books book name}} {{include './partials/book_card.art' book}} {{/each}}
+    </div>
+</div>
+
+
+{{/block}} {{block 'page_footer'}}
+
+<script>
+    turn_bar_on("books")
+</script> {{/block}}
