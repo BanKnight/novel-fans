@@ -7,17 +7,21 @@
     </div>
     <h1 class="weui-header-title f-black">{{book.name}}</h1>
 </div>
-{{/block}} {{block 'bar_body'}}
+{{/block}} 
+
+{{block 'bar_body'}}
 
 <div class="weui-weixin-page">
     <h2 class="weui-weixin-title">{{chapter.name}}</h2>
-    <div class="weui-weixin-content">
+    <div class="weui-weixin-content" id="chapter">
         {{@chapter.content}}
         <br>
     </div>
 </div>
 
-{{/block}} {{block 'bar_footer'}}
+{{/block}} 
+
+{{block 'bar_footer'}}
 
     {{set older = index - 1}}
     {{set newer = 1 + index}}
@@ -71,4 +75,30 @@
             <p class="weui_tabbar_label">下一章(无)</p>
         </a>    
     {{/if}}
+
+<script>
+        let that_bar_body = $(`#bar_body`)
+        let that_bar_footer = $(`#bar_footer`)
+    
+        let page_height = (that_bar_body.height() - that_bar_footer.height()) * 0.98
+    
+        console.log(`page height is:${page_height}，${that_bar_body.height()}，${that_bar_footer.height()}`)
+    
+        let left_range = [0,window.innerWidth * 0.3]
+        let middle_range = [window.innerWidth * 0.3 + 1, window.innerWidth * 0.7]
+        let right_range = [window.innerWidth * 0.7 + 1, window.innerWidth]
+    
+        that_bar_body.click((e)=>
+        {
+            if(e.clientX < left_range[1])
+            {
+                that_bar_body.scrollTop(that_bar_body.scrollTop() - page_height)
+            }
+            else if(e.clientX > right_range[0])
+            {
+                that_bar_body.scrollTop(that_bar_body.scrollTop() + page_height)
+            }
+        })
+    
+    </script>
 {{/block}}

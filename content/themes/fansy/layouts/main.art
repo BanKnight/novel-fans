@@ -33,20 +33,24 @@
         </div>
 
         <script>
+
                 function scroll_bar_body_top(){
                     let that_bar = $(`#bar_body`)
-
                     that_bar.animate({scrollTop:"0px"},1000)
                 }
 
-                
                 function scroll_bar_body_bottom(){
                     let that_bar = $(`#bar_body`)
 
                     that_bar.animate({scrollTop:that_bar.height()},1000)
                 }
+
+                // that_bar.click((e)=>
+                // {
+                //     console.log(`${e.clientX} ${e.clientY} ${window.innerWidth}`)
+                // })
         </script>
-        <div class="weui_tabbar ">
+        <div class="weui_tabbar" id="bar_footer">
             {{block 'bar_footer'}}
             <a href="/" class="weui_tabbar_item" id="books">
                 <div class="weui_tabbar_icon">
