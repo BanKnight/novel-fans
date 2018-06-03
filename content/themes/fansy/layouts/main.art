@@ -42,7 +42,7 @@
                 function scroll_bar_body_bottom(){
                     let that_bar = $(`#bar_body`)
 
-                    that_bar.animate({scrollTop:that_bar.height()},1000)
+                    that_bar.animate({scrollTop:that_bar[0].scrollHeight},1000)
                 }
 
                 // that_bar.click((e)=>
