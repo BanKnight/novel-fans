@@ -1,6 +1,7 @@
 const helmet = require('koa-helmet')
 const limit = require('koa-limit')
 const convert = require('koa-convert')
+var bodyParser = require('koa-bodyparser')
 
 const server = global.server
 const app = server.app
@@ -35,8 +36,6 @@ routers.use(helmet.frameguard())
 routers.use(helmet.xssFilter())         
 routers.use(helmet.hidePoweredBy())     //      删除了 header 中的 X-Powered-By 标签
 routers.use(helmet.ieNoOpen())
-
-var bodyParser = require('koa-bodyparser')
 
 routers.use(bodyParser())
 

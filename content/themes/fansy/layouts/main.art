@@ -28,9 +28,24 @@
         {{block 'bar_head'}}
         {{/block}}
 
-        <div class="weui_tab_bd">
+        <div class="weui_tab_bd" id="bar_body">
             {{block 'bar_body'}} this is main {{/block}}
         </div>
+
+        <script>
+                function scroll_bar_body_top(){
+                    let that_bar = $(`#bar_body`)
+
+                    that_bar.animate({scrollTop:"0px"},1000)
+                }
+
+                
+                function scroll_bar_body_bottom(){
+                    let that_bar = $(`#bar_body`)
+
+                    that_bar.animate({scrollTop:that_bar.height()},1000)
+                }
+        </script>
         <div class="weui_tabbar ">
             {{block 'bar_footer'}}
             <a href="/" class="weui_tabbar_item" id="books">

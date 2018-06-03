@@ -25,7 +25,7 @@ me.start = async()=>
 
     console.log(`has alread load ${data.items.length} log`)
 
-    console.dir(data.items)
+    // console.dir(data.items)
 
     return true
 }

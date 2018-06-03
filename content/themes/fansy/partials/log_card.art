@@ -1,4 +1,4 @@
 <div class="weui_media_box weui_media_text">
-    <h4 class="weui_media_title">{{update | moment 'YYYY-MM-DD'}}</h4>
+    <h4 class="weui_media_title">{{update | moment 'YYYY-MM-DD hh:mm:ss'}}</h4>
     <p class="weui_media_desc">{{content}}</p>
 </div>

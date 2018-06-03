@@ -61,7 +61,24 @@ me.start = async()=>
 
     console.log(`has ready load ${db_data.length} chapters`)
 
+    server.run_revery(10 * 60 * 1000,20 * 60 * 1000,me.check_update)
+
     return true
+}
+
+me.check_update = async()=>
+{
+    for(let name in data)
+    {
+        let book = data[name]
+
+        let is_updated = await md_tasks.update(book)
+
+        if(is_updated == true)
+        {
+            me.update(book)
+        }
+    }
 }
 
 me.add = (book)=>
@@ -98,9 +115,14 @@ me.add = (book)=>
 // 用于一本小说有更新后，写入更新的部分到db
 me.update = (book)=>
 {
-    for(let last = book.count,first = 1;last >= first;--last)
+    for(let last = book.count - 1,first = 0;last >= first;--last)
     {
         let chapter = book.chapters[last]
+        if(chapter == null)
+        {
+            continue
+        }
+        
         if(chapter.need_save == true)
         {
             const db = {

@@ -20,13 +20,19 @@ web_site.search = async(name)=>
 
     let book = await web_site.search_basic(name)
 
+    if(book.name != name)
+    {
+        web_site.logs.add(`[${web_site.name}] no such book : ${name}`)
+        return null
+    }
+
     web_site.logs.add(`[${web_site.name}]search_catalog start : ${name}`)
 
     await web_site.search_catalog(book)
 
     web_site.logs.add(`[${web_site.name}]search_chapters start : ${name}`)
 
-    await web_site.search_chapters(book)
+    await web_site.search_chapters(book,book.count - 1)
 
     web_site.logs.add(`[${web_site.name}]search_chapters done : ${name}`)
 
@@ -63,9 +69,9 @@ web_site.search_catalog = async(book)=>
 {
     let url = `${web_site.url}/h5/cpt/ajax/detail`
 
-    let curr_page = 0,total_pages = 100
-
     book.chapters = {}
+
+    let curr_page = 0,total_pages = 100
 
     for(let i = 0;i < 1000;++i)             //最多获取1000页
     {
@@ -84,7 +90,10 @@ web_site.search_catalog = async(book)=>
         {
             // console.log(`parsing page,page:${info.list.curPage},total:${info.list.totalPages}`)
 
-            web_site.parse_catalog(book,info.list.items)
+            if(web_site.parse_catalog(book,info.list.items) == false)
+            {
+                break
+            }
 
             if(info.list.curPage % 10 == 0)
             {
@@ -103,14 +112,42 @@ web_site.search_catalog = async(book)=>
     }
 }
 
+/*
+    return should_continue
+*/
+web_site.parse_catalog = (book,items)=>
+{
+    let should_continue = false
+
+    for(let i = 0,len = items.length;i < len;++i)
+    {
+        let item = items[i]
+        if(book.chapters[item.index])
+        {
+            return should_continue
+        }
+
+        book.chapters[item.index] = {
+            book : book.name,
+            ckey : item.ckey,
+            name : item.name,
+            index : item.index,
+            update : item.updateTime,
+        }
+
+        book.count++
+    }
+    return true
+}
+
 //https://yd.sogou.com/h5/cpt/chapter?
-web_site.search_chapters = async(book)=>
+web_site.search_chapters = async(book,start,stop)=>
 {
     let url = `${web_site.url}/h5/cpt/chapter`
 
     // let folder = `./novels/${book.name}`
 
-    for(let i = 0,len = book.count;i < len;++i)
+    for(let i = start;i <= stop;++i)
     {
         let chapter = book.chapters[i]
 
@@ -124,30 +161,58 @@ web_site.search_chapters = async(book)=>
         let $ = web_site.cheerio.load(html,{decodeEntities: false})
 
         chapter.content = $("#text").html()
+        chapter.need_save = true
 
         // fs.writeFileSync(`${folder}/${chapter.name}.html`, chapter.content)
 
-        if(i % 10 == 0)
+        if(i % 50 == 0)
         {
             web_site.logs.add(`[${web_site.name}]fetching content ${book.name},count : ${i},chapter:${chapter.name}`)
         }
-
     }
 }
 
-web_site.parse_catalog = (book,items)=>
+web_site.update = async(book)=>
 {
-    for(let i = 0,len = items.length;i < len;++i)
-    {
-        let item = items[i]
+    let curr_page = 0,total_pages = 100
+    let old_count = book.count
 
-        book.chapters[item.index] = {
-            ckey : item.ckey,
-            name : item.name,
-            index : item.index,
-            update : item.updateTime,
+    for(let i = 0;i < 1000;++i)             //最多获取1000页
+    {
+        curr_page ++
+
+        if(curr_page > total_pages)
+        {
+            break
         }
 
-        book.count++
+        let body = await web_site.crawler.get(web_site.name,url,{bkey:book.bkey,p : curr_page,asc:"desc"})
+
+        let info = JSON.parse(body)
+
+        try
+        {
+            // console.log(`parsing page,page:${info.list.curPage},total:${info.list.totalPages}`)
+
+            if(web_site.parse_catalog(book,info.list.items) == false)
+            {
+                break
+            }
+        }
+        catch(err)
+        {
+            console.log(err)
+            break
+        }
+ 
+        curr_page = info.list.curPage
+        total_pages = info.list.totalPages
     }
+
+    if(book.count > old_count)
+    {
+        web_site.search_chapters(book,old_count,book.count - 1)
+    }
+
+    return book.count > old_count
 }

@@ -12,13 +12,17 @@
         function search()
         {
             let content = $("#search_content").val()
+
+            console.log("content is:" + content)
             
             $.post({
                 url : "/search",
                 dataType: 'json',
-                data : {keword : content},
+                data : {keyword : content},
                 success:function(data){
-                    $.toast(`操作成功`)
+
+                    $.toast(data.msg)
+                    // console.dir(data)
                 },
                 error:function(e){                    
                     $.toast("操作失败","cancle")

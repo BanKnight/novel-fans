@@ -54,14 +54,6 @@ me.start = async()=>
     return true
 }
 
-/*
-    检查书籍更新
-*/
-me.update = ()=>
-{
-
-}
-
 me.search = async(book_name)=>
 {
     let is_lock = await md_locks.lock(book_name)
@@ -96,7 +88,10 @@ me.search = async(book_name)=>
     for(let i = 0,len = books.length;i < len;++i)
     {
         let book = books[i]
-
+        if(book == null)
+        {
+            continue
+        }
         if(the_best_book)
         {
             if(book.chapters.count > the_best_book.chapters.count)
@@ -109,7 +104,30 @@ me.search = async(book_name)=>
         }
     }
 
-    md_locks.unlock(book_name,the_best_book)
+    md_locks.unlock(book_name,false)        //让那些等待锁的 都返回false
 
     return the_best_book
+}
+
+me.update = async(book)=>
+{
+    let is_lock = await md_locks.lock(book.name)
+
+    if(is_lock !== true)
+    {
+        md_logs.add(`${book.name} is already added to the updating task`)
+        return is_lock
+    }
+
+    md_logs.add(`${book.name} is updating`)
+
+    let sub = subs[book.site]
+
+    let is_updated = await sub.update(book)
+
+    md_logs.add(`update ${book.name} is done`)
+
+    md_locks.unlock(book.name,false)
+
+    return is_updated
 }
