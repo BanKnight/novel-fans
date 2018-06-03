@@ -95,7 +95,7 @@ web_site.search_catalog = async(book)=>
                 break
             }
 
-            if(info.list.curPage % 10 == 0)
+            if(info.list.curPage % 50 == 0)
             {
                 web_site.logs.add(`[${web_site.name}]parsing catalog ${book.name},page:${info.list.curPage},total:${info.list.totalPages}`)
             }
