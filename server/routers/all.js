@@ -83,16 +83,16 @@ routers.post("/search",async(ctx,next)=>
 
         setImmediate(async()=>
         {
-            md_logs.add('${book_name} searching')
+            md_logs.add(`${book_name} searching`)
 
             let book = await md_tasks.search(book_name)
             if(book == null)
             {
-                md_logs.add('searching ${book_name} failed')
+                md_logs.add(`searching ${book_name} failed`)
             }
             else if(book !== false)     //等于false 表示后来者，第一个查询的返回的是book
             {
-                md_logs.add('searching ${book_name} ok')
+                md_logs.add(`searching ${book_name} ok`)
                 md_books.add(book)
             }
         })
