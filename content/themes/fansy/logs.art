@@ -18,6 +18,7 @@
 
     <script>
         turn_bar_on("logs")
+        scroll_bar_body_bottom()
     </script>
 
 {{/block}}
