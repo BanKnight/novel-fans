@@ -110,6 +110,9 @@ web_site.search_catalog = async(book)=>
         curr_page = info.list.curPage
         total_pages = info.list.totalPages
     }
+
+    web_site.logs.add(`[${web_site.name}]parsing catalog ${book.name} done,catalogs:${book.count}`)
+
 }
 
 /*

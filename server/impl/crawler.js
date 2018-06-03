@@ -130,7 +130,7 @@ me.do_post_task = (source,task)=>
                 console.log("status is not 200")
             }
 
-            if(task.try < 3)
+            if(task.try < 30)
             {
                 queues[source].push(task)
             }
