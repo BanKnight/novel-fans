@@ -1,5 +1,5 @@
 const fs = require("fs")
-const request = require("../../kernel/request")
+const request = require("request")
 const assert = require("assert")
 
 const me = server.get("crawler")
@@ -24,6 +24,8 @@ me.start = async()=>
 
 me.update = function()
 {
+
+
     for(let source in queues)
     {
         let queue = queues[source]
@@ -70,32 +72,32 @@ me.do_get_task = (source,task)=>
         url : task.url,
         qs: task.data,
         timeout: 300,
-        // gzip : true,
-        // headers : data.headers,
+        gzip : true,
+        headers : data.headers,
     }
 
-    console.log(`requesting get task ${task.url}`)
-    console.dir(options.qs)
+    // console.log(`requesting get task ${task.url}`)
+    // console.dir(options.qs)
 
     request.get(options,function(error, response, body)
     {
-        console.log(`get cb ${task.url}`)
-
-        let is_ok = true
+        task.try++
         if(error || response.statusCode != 200)
         {
             console.log(error)
 
-            server.run_after(3000,()=>
+            if(task.try < 3)
             {
                 queues[source].push(task)
-
-            })
-
+            }
+            else
+            {
+                task.cb(false)
+            }
             return
         }
 
-        task.cb(is_ok,body)
+        task.cb(true,body)
     })
 }
 
@@ -106,16 +108,17 @@ me.do_post_task = (source,task)=>
         form: task.data,
         gzip:true,
         timeout: 3000,
-        // headers : data.headers,
+        headers : data.headers,
     }
 
-    console.log(`requesting post task ${task.url}`)
+    // console.log(`requesting post task ${task.url}`)
 
     request.post(options,function(error, response, body)
     {
-        console.log(`post cb ${task.url}`)
+        // console.log(`post cb ${task.url}`)
 
-        let is_ok = true
+        task.try ++
+
         if(error || response.statusCode != 200)
         {
             if(error)
@@ -127,12 +130,18 @@ me.do_post_task = (source,task)=>
                 console.log("status is not 200")
             }
 
-            queues[source].push(task)
+            if(task.try < 3)
+            {
+                queues[source].push(task)
+            }
+            else
+            {
+                task.cb(false)
+            }
             return
-            // is_ok = false
         }
 
-        task.cb(is_ok,body)
+        task.cb(true,body)
     })
 }
 /*
@@ -154,6 +163,7 @@ me.post_async = (source,info)=>
         url : info.url,
         data : info.data,
         cb : info.cb,
+        try : 0,
     })
 
     // console.log(`add a new post task ${info.url}`)
@@ -173,6 +183,7 @@ me.get_async = (source,info,cb)=>
         url : info.url,
         data : info.data,
         cb : info.cb,
+        try : 0,
     })
 
     // console.log(`add a new get task ${info.url}`)

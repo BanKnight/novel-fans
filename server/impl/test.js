@@ -4,88 +4,59 @@ const assert = require("assert")
 
 const md_tasks = server.get("tasks")
 const md_crawler = server.get("crawler")
+const md_books = server.get("books")
 
 const me = server.get("test")
 const data = me.data
 
-
 const web_site = {}
 
 me.start = async function () {
+
     server.run_after(1000, async () => {
         console.log("begin test")
         me.test_search_book()
     })
 
+    // me.test_timer()
+
     return true
+}
+
+me.test_timer = function()
+{
+    server.run_after(1000,function(){
+        console.log("after 1 sec")
+
+        server.run_revery(1000,2000,function()
+        {
+            console.log("every 1 sec : " + Math.random() * 100)
+
+        })
+
+    })
 }
 
 me.test_search_book = async () => {
     // me.test_task()
     // me.test_request()
-    me.test_my_request()
+    // me.test_my_request()
 }
 
-me.test_my_request = ()=>
-{
-    let request = require("../../kernel/request")
-    let count = 0
-
-    let request_catalog = (curr_page)=>
-    {
-        if(curr_page > 30)
-        {
-            return
-        }
-
-        console.log("before request")
-
-        request.get({url : "https://yd.sogou.com/h5/cpt/ajax/detail",qs:
-            {
-                bkey: 'DFFBD9CAEDA706297C4264E7C7AD4D86', p: curr_page, asc: "asc" 
-            }},
-            (error, response, body) => {
-                if (error) {
-                    console.log(`got an error : ${error}`)
-                                    
-                    request_catalog(curr_page)
-
-                    return
-                }
-                if (response.statusCode != 200) {
-                    console.log("error")
-                    return
-                }
-
-                // console.log(body)
-
-                count ++
-
-                let info = JSON.parse(body)
-
-                console.log(`get ${info.list.curPage},count : ${count}`)
-
-                request_catalog(++curr_page)
-            })
-        
-    }
-
-    request.get({url : "https://yd.sogou.com/h5/search",qs : { query: "修真聊天群" } }, (err,resp,body) => {
-
-        // console.log("finish search:" + body)
-
-        fs.writeFileSync("search.html",body)
-
-        for(var i = 1; i <= 1;++i)
-        {
-            request_catalog(i)
-        }
-
-    })
-}
 
 me.test_task = async() => {
-    let book = await md_tasks.search("修真聊天群")
+
+    let search_name = "修真聊天群"
+    let book = md_books.get(search_name)
+
+    if(book == null)
+    {
+        book = await md_tasks.search("修真聊天群")
+        if(book)
+        {
+            md_books.add(book)
+        }
+    }
 }
 
 me.test_request = () => {

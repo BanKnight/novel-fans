@@ -6,9 +6,12 @@ const server = global.server
 const app = server.app
 const routers = server.routers
 
+console.log("-----------------------routers")
+
 routers.use(async (ctx,next)=>
 {
     console.log(`Process ${ctx.req.method} ${ctx.req.url}`);
+    // console.dir(ctx.request.headers)
         
     await next()
 })
@@ -17,12 +20,8 @@ routers.use(async(ctx,next)=>
 {
     ctx.state = server.data
 
-    console.log(`state routers`);
-
     await next()
 })
-
-
 
 routers.use(convert(limit({
     limit: 1000,

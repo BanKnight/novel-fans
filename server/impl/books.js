@@ -51,11 +51,11 @@ me.start = async()=>
             content : db_one_data.content,
         }
 
-        book.chapers[chapter.index] = chapter
+        book.chapters[chapter.index] = chapter
         book.count ++
     }
 
-    console.log(`has ready load ${db_data.length} chapers`)
+    console.log(`has ready load ${db_data.length} chapters`)
 
     return true
 }
@@ -79,7 +79,7 @@ me.add = (book)=>
 
     for(let index in book.chapters)
     {   //chapter
-        let chapter = books.chapters[index]
+        let chapter = book.chapters[index]
 
         const db = {
             name : chapter.name,
@@ -113,4 +113,14 @@ me.update = (book)=>
             break
         }
     }
+}
+
+me.get = function(name)
+{
+    return data[name]
+}
+
+me.get_all = function(name)
+{
+    return data
 }

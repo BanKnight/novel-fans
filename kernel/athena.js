@@ -59,7 +59,7 @@ server.start_modules = async()=>
         let that = server.sorted_mds[i].md
         if(that.start != null)
         {
-            console.log(`starting ${server.sorted_mds[i].name}`)
+            console.log(`starting -- ${server.sorted_mds[i].name}`)
 
             let ret = await that.start()
             if(ret == false)
@@ -68,6 +68,8 @@ server.start_modules = async()=>
             }
         }
     }
+
+    console.log("start all modules")
 
     return true
 }

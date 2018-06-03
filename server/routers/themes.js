@@ -65,8 +65,3 @@ if(process.env != "production")
     // app.use(static(admin_static,{prefix:"/labs/",buffer:true,gzip:true,dynamic:true}))
 }
 
-routers.get("/",async(ctx,next)=>
-{
-    ctx.body = "hello world"
-})
-

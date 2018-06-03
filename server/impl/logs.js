@@ -57,5 +57,7 @@ me.add = (content)=>
 
         md_db.upsert("logs",{_id : log.id},db)
     }
+
+    console.log(content)
 }
 

@@ -95,7 +95,7 @@ me.search = async(book_name)=>
     //找出章节数最多的
     for(let i = 0,len = books.length;i < len;++i)
     {
-        let book = books[book]
+        let book = books[i]
 
         if(the_best_book)
         {

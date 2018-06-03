@@ -30,11 +30,11 @@ me.run_revery = (from,to,cb)=>
 
     let wrapper = function()
     {
-        info.id = setInterval(wrapper,rand(from,to))
+        info.id = setTimeout(wrapper,rand(from,to))
         cb()
     }
 
-    info.id = setInterval(wrapper,rand(from,to))
+    info.id = setTimeout(wrapper,rand(from,to))
 }
 
 me.remove = (info)=>

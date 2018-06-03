@@ -1,3 +1,5 @@
+const fs = require("fs")
+
 let web_site = {}
 
 module.exports = web_site
@@ -48,6 +50,7 @@ web_site.search_basic = async(name)=>
         author : author_html.html(),
         summary : summary_html.html(),
         bkey : result_html.attr("bkey"),
+        count : 0,
     }
 
     // console.dir(book)
@@ -79,14 +82,20 @@ web_site.search_catalog = async(book)=>
 
         try
         {
-            console.log(`parsing page,page:${info.list.curPage},total:${info.list.totalPages}`)
+            // console.log(`parsing page,page:${info.list.curPage},total:${info.list.totalPages}`)
 
             web_site.parse_catalog(book,info.list.items)
+
+            if(info.list.curPage % 10 == 0)
+            {
+                web_site.logs.add(`[${web_site.name}]parsing catalog ${book.name},page:${info.list.curPage},total:${info.list.totalPages}`)
+            }
+
         }
         catch(err)
         {
             console.log(err)
-            // console.log(body)
+            break
         }
  
         curr_page = info.list.curPage
@@ -99,7 +108,9 @@ web_site.search_chapters = async(book)=>
 {
     let url = `${web_site.url}/h5/cpt/chapter`
 
-    for(let i = 0,len = book.chapters.length;i < len;++i)
+    // let folder = `./novels/${book.name}`
+
+    for(let i = 0,len = book.count;i < len;++i)
     {
         let chapter = book.chapters[i]
 
@@ -107,18 +118,18 @@ web_site.search_chapters = async(book)=>
         {
             continue
         }
-
+        
         let html = await web_site.crawler.get(web_site.name,url,{bkey : book.bkey,ckey : chapter.ckey})
 
         let $ = web_site.cheerio.load(html,{decodeEntities: false})
 
-        let text_html = $("#text")
+        chapter.content = $("#text").html()
 
-        chapter.content = text_html.html()
+        // fs.writeFileSync(`${folder}/${chapter.name}.html`, chapter.content)
 
         if(i % 10 == 0)
         {
-            console.log("has already write:" + i)
+            web_site.logs.add(`[${web_site.name}]fetching content ${book.name},count : ${i},chapter:${chapter.name}`)
         }
 
     }
@@ -136,5 +147,7 @@ web_site.parse_catalog = (book,items)=>
             index : item.index,
             update : item.updateTime,
         }
+
+        book.count++
     }
 }

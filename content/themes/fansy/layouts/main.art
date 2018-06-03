@@ -1,0 +1,53 @@
+{{extend './default.art'}} 
+
+{{block 'page_body'}}
+
+<div class="weui_tab tab-bottom">
+    <div class="weui_tab_bd">
+        {{block 'bar_body'}}
+            this is main
+        {{/block}}
+    </div>
+    <div class="weui_tabbar ">
+        <a href="/" class="weui_tabbar_item" id="books">
+            <div class="weui_tabbar_icon">
+                <img src="/public/img/icon_nav_button.png" alt="">
+            </div>
+            <p class="weui_tabbar_label">书架</p>
+        </a>
+        <a href="/search" class="weui_tabbar_item" id="search">
+            <div class="weui_tabbar_icon">
+                <img src="/public/img/icon_nav_article.png" alt="">
+            </div>
+            <p class="weui_tabbar_label">发现</p>
+        </a>
+        <a href="/logs" class="weui_tabbar_item" id="logs">
+            <div class="weui_tabbar_icon">
+                <img src="/public/img/icon_nav_cell.png" alt="">
+            </div>
+            <p class="weui_tabbar_label">日志</p>
+        </a>
+        <a href="/me" class="weui_tabbar_item" id="me">
+            <div class="weui_tabbar_icon">
+                <img src="/public/img/icon_nav_cell.png" alt="">
+            </div>
+            <p class="weui_tabbar_label">我</p>
+        </a>
+
+        <script>
+            function turn_bar_on(id) {
+                let that_bar = $(`#${id}`)
+                let old_on_bar = $(".weui_tabbar_item.weui_bar_item_on")
+
+                if (old_on_bar) {
+                    old_on_bar.removeClass("weui_bar_item_on")
+                }
+                if (that_bar) {
+                    that_bar.addClass("weui_bar_item_on")
+                }
+            }
+        </script>
+    </div>
+</div>
+
+{{/block}}

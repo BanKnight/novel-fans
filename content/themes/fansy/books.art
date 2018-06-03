@@ -1,0 +1,35 @@
+{{extend './layouts/main.art'}}
+
+{{block 'bar_body'}}
+
+<div class="weui_panel weui_panel_access">
+    <div class="weui_search_bar">
+        <form class="weui_search_outer">
+            <div class="weui_search_inner">
+                <i class="weui_icon_search"></i>
+                <input type="search" class="weui_search_input" id="weui_search_input" placeholder="关键字" required="">
+                <a href="javascript:" class="weui_icon_clear"></a>
+            </div>
+            <label for="weui_search_input" class="weui_search_text" style="transform-origin: 0px 0px 0px; opacity: 1; transform: scale(1, 1); display: none;">
+                <i class="weui_icon_search"></i>
+                <span>关键字</span>
+            </label>
+        </form>
+        <a href="javascript:" class="weui_search_cancel">取消</a>
+    </div>
+    <div class="weui_panel_bd">
+        {{each books name book}}
+            {{include './partials/book_summary.art' book}}
+        {{/each}}
+    </div>
+</div>
+
+{{/block}}
+
+{{block 'page_footer'}}
+
+    <script>
+        turn_bar_on("books")
+    </script>
+
+{{/block}}
