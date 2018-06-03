@@ -32,7 +32,7 @@ web_site.search = async(name)=>
 
     web_site.logs.add(`[${web_site.name}]search_chapters start : ${name}`)
 
-    await web_site.search_chapters(book,book.count - 1)
+    await web_site.search_chapters(book,0,book.count - 1)
 
     web_site.logs.add(`[${web_site.name}]search_chapters done : ${name}`)
 
