@@ -6,6 +6,9 @@
         <a class="icon icon-109 f-black" href="javascript:history.back()"></a>
     </div>
     <h1 class="weui-header-title f-black">{{book.name}}</h1>
+    <div class="weui-header-right">
+        <a class="icon icon-108 f-black">换源</a>
+    </div>
 </div>
 {{/block}} 
 

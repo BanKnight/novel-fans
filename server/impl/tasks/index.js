@@ -16,7 +16,6 @@ const data = me.data
 
 me.start = async()=>
 {
-
     console.log("start tasks!!!")
 
     // server.run_every(2 * 60 * 1000,me.update)
@@ -51,6 +50,9 @@ me.start = async()=>
             sub.init(env)
         }
     }
+
+    server.data.subs = subs
+
     return true
 }
 
