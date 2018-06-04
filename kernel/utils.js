@@ -20,3 +20,8 @@ global.rand = function(first,second)
 {
     return parseInt(Math.random()*(second-first+1)+first,10); 
 }
+
+global.del_html_tag = function(str)
+{
+    return str.replace(/<[^>]+>/g,"");//去掉所有的html标记
+}

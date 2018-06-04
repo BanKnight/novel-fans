@@ -1,5 +1,6 @@
 module.exports = {
-    site : "http://bansky.mustbe.cool",
+    web_name : "周周读",
+    site : "http://novel.mustbe.cool",
     port:80,
     content:"./content",
     theme:"fansy",

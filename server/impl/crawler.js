@@ -24,8 +24,6 @@ me.start = async()=>
 
 me.update = function()
 {
-
-
     for(let source in queues)
     {
         let queue = queues[source]
@@ -85,16 +83,19 @@ me.do_get_task = (source,task)=>
         task.try++
         if(error || response.statusCode != 200)
         {
-            console.log(error)
-
-            if(task.try < 30)
+            if(error)
             {
-                queues[source].push(task)
+                console.log(error)
             }
             else
             {
-                task.cb(false)
+                console.log("status is not 200")
             }
+            server.run_after(3000,()=>
+            {
+                queues[source].push(task)
+            })
+
             return
         }
 
@@ -131,14 +132,11 @@ me.do_post_task = (source,task)=>
                 console.log("status is not 200")
             }
 
-            if(task.try < 30)
+            server.run_after(3000,()=>
             {
                 queues[source].push(task)
-            }
-            else
-            {
-                task.cb(false)
-            }
+            })
+
             return
         }
 

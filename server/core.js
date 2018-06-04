@@ -14,10 +14,17 @@ server.start = async function()
 
     server.start_routers()
 
+    server.init_data()
+
     app.listen(config.port)
 
     console.log(`listening at ${config.port}`)
 
     return true
+}
+
+server.init_data = async function()
+{
+    server.data.web_name = config.web_name
 }
 

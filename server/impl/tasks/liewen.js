@@ -8,7 +8,7 @@ web_site.init = (env)=>
 {
     web_site.env = env
     web_site.url = "https://www.liewen.cc"
-
+    web_site.priority = 100
     web_site.crawler = env.crawler
     web_site.cheerio = env.cheerio
     web_site.logs = env.logs
@@ -37,7 +37,7 @@ web_site.search_basic = async(name)=>
 {
     let url = `${web_site.url}/search.php`
 
-    console.log("url is : " + url)
+    // console.log("url is : " + url)
 
     let body = await web_site.crawler.get(web_site.name,url,{keyword : name})
 
@@ -48,7 +48,7 @@ web_site.search_basic = async(name)=>
 
     let book_ref = book_html.attr("href")
 
-    console.log("book ref is:" + book_ref)
+    // console.log("book ref is:" + book_ref)
 
     book_html = await web_site.crawler.get(web_site.name,book_ref)
 
@@ -70,8 +70,7 @@ web_site.search_basic = async(name)=>
         name : title_html.html(),
         site : web_site.name,
         author : author_html.html().split("：")[1],
-        summary : summary_html.html(),
-        count : 0,
+        summary : del_html_tag(summary_html.html()),
 
         temp :{
             url:book_ref,                   
@@ -100,12 +99,10 @@ web_site.search_catalog = async(book)=>
         book.chapters.push({
             book : book.name,
             name : html.html(),
-            index : book.count,
+            index : book.chapters.length,
             update : Date.now(),
             url : `${web_site.url}${html.attr("href")}`,
         })
-
-        book.count++
     });
 
     // console.dir(book.chapters)
@@ -132,12 +129,13 @@ web_site.search_chapters = async(book,start,stop)=>
 
         let $ = web_site.cheerio.load(html,{decodeEntities: false})
 
+        chapter.site = web_site.name
         chapter.content = $("#content").html()        //这里有加入书签的html代码
         chapter.need_save = true
 
         if(i % 50 == 0)
         {
-            web_site.logs.add(`[${web_site.name}]fetching content ${book.name},count : ${i} / ${book.count},chapter:${chapter.name}`)
+            web_site.logs.add(`[${web_site.name}]fetching content ${book.name},count : ${i} / ${book.chapters.length},chapter:${chapter.name}`)
         }
     }
 }

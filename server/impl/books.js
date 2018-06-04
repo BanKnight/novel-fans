@@ -5,6 +5,7 @@ const server = global.server
 
 const md_db = server.get("db")
 const md_tasks = server.get("tasks")
+const md_logs = server.get("logs")
 
 const me = server.get("books")
 const data = me.data
@@ -23,8 +24,7 @@ me.start = async()=>
             site : db_one_data.site,
             last : db_one_data.last || 0,
 
-            chapters : {},
-            count : 0,              //章节数量
+            chapters : [],
         }
 
         data[book.name] = book
@@ -52,11 +52,18 @@ me.start = async()=>
             book : db_one_data.book,
             index : db_one_data.index,      //从1开始
             name : db_one_data.name,
+            site : db_one_data.site,
             content : db_one_data.content,
         }
 
-        book.chapters[chapter.index] = chapter
-        book.count ++
+        book.chapters.push(chapter)
+    }
+
+    for(let book_name in data)
+    {
+        let book = data[book_name]
+
+        book.chapters.sort(me.chapter_cmp)
     }
 
     console.log(`has ready load ${db_data.length} chapters`)
@@ -64,6 +71,11 @@ me.start = async()=>
     // server.run_revery(10 * 60 * 1000,20 * 60 * 1000,me.check_update)
 
     return true
+}
+
+me.chapter_cmp = (first,second)=>
+{
+    return first.index - second.index
 }
 
 me.check_update = async()=>
@@ -98,13 +110,19 @@ me.add = (book)=>
         md_db.upsert("basic",{_id : book.name},db)
     }
 
-    for(let index in book.chapters)
+    for(let index = 0;index < book.chapters.length;++index)
     {   //chapter
         let chapter = book.chapters[index]
 
         const db = {
             name : chapter.name,
+            site : chapter.site,
             content : chapter.content
+        }
+
+        if(typeof(index) != "number")
+        {
+            console.log("index is not number:" + typeof(index))
         }
 
         md_db.upsert("chapter",{book : book.name,index : index},db)
@@ -115,7 +133,12 @@ me.add = (book)=>
 // 用于一本小说有更新后，写入更新的部分到db
 me.update = (book)=>
 {
-    for(let last = book.count - 1,first = 0;last >= first;--last)
+
+    md_logs.add(`${book.name} begin to update to db`)
+
+    let update_count = 0
+
+    for(let last = book.chapters.length - 1,first = 0;last >= first;--last)
     {
         let chapter = book.chapters[last]
         if(chapter == null)
@@ -125,20 +148,25 @@ me.update = (book)=>
 
         if(chapter.need_save == true)
         {
+            update_count++
+
             const db = {
                 name : chapter.name,
+                site : chapter.site,
                 content : chapter.content
             }
 
             chapter.need_save = null
 
-            md_db.upsert("chapter",{book : book.name,index : index},db)
+            md_db.upsert("chapter",{book : book.name,index : chapter.index},db)
         }
         else
         {
             break
         }
     }
+
+    md_logs.add(`${book.name} update:${update_count} chapters`)
 }
 
 me.get = function(name)

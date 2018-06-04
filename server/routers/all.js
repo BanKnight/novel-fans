@@ -45,13 +45,13 @@ routers.get("/chapter/:book_name/:chapter_index",async(ctx,next)=>
 
     if(book)
     {
-        chapter = book.chapters[ctx.params.chapter_index]
+        chapter = book.chapters[parseInt(ctx.params.chapter_index)]
     }
 
     let info = {
         book : book,
         chapter : chapter,
-        index : parseInt(chapter.index),
+        index : chapter.index,
     }
 
     ctx.render("chapter",info)
@@ -84,19 +84,6 @@ routers.post("/search",async(ctx,next)=>
         setImmediate(async()=>
         {
             md_tasks.try_add_book(book_name)
-
-            // md_logs.add(`${book_name} searching`)
-
-            // let book = await md_tasks.search(book_name)
-            // if(book == null)
-            // {
-            //     md_logs.add(`searching ${book_name} failed`)
-            // }
-            // else if(book !== false)     //等于false 表示后来者，第一个查询的返回的是book
-            // {
-            //     md_logs.add(`searching ${book_name} ok`)
-            //     md_books.add(book)
-            // }
         })
     }
 })

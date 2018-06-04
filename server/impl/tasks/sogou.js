@@ -6,6 +6,7 @@ web_site.init = (env)=>
 {
     web_site.env = env
     web_site.url = "https://yd.sogou.com"
+    web_site.priority = 99
 
     web_site.crawler = env.crawler
     web_site.cheerio = env.cheerio
@@ -47,8 +48,10 @@ web_site.search_basic = async(name)=>
         site : web_site.name,
         author : author_html.html(),
         summary : summary_html.html(),
-        bkey : result_html.attr("bkey"),
-        count : 0,
+
+        temp :{
+            bkey : result_html.attr("bkey"),
+        }
     }
 
     // console.dir(book)
@@ -74,7 +77,7 @@ web_site.search_catalog = async(book)=>
             break
         }
 
-        let body = await web_site.crawler.get(web_site.name,url,{bkey:book.bkey,p : curr_page,asc:"asc"})
+        let body = await web_site.crawler.get(web_site.name,url,{bkey:book.temp.bkey,p : curr_page,asc:"asc"})
 
         let info = JSON.parse(body)
 
@@ -103,7 +106,7 @@ web_site.search_catalog = async(book)=>
         total_pages = info.list.totalPages
     }
 
-    web_site.logs.add(`[${web_site.name}]parsing catalog ${book.name} done,catalogs:${book.count}`)
+    web_site.logs.add(`[${web_site.name}]parsing catalog ${book.name} done,catalogs:${book.chapters.length}`)
 
 }
 
@@ -117,6 +120,7 @@ web_site.parse_catalog = (book,items)=>
     for(let i = 0,len = items.length;i < len;++i)
     {
         let item = items[i]
+
         if(book.chapters[item.index])
         {
             return should_continue
@@ -126,11 +130,10 @@ web_site.parse_catalog = (book,items)=>
             book : book.name,
             ckey : item.ckey,
             name : item.name,
-            index : parseInt(item.index),
+            index : book.chapters.length,
             update : item.updateTime,
         })
 
-        book.count++
     }
     return true
 }
@@ -151,26 +154,29 @@ web_site.search_chapters = async(book,start,stop)=>
             continue
         }
         
-        let html = await web_site.crawler.get(web_site.name,url,{bkey : book.bkey,ckey : chapter.ckey})
+        let html = await web_site.crawler.get(web_site.name,url,{bkey : book.temp.bkey,ckey : chapter.ckey})
 
         let $ = web_site.cheerio.load(html,{decodeEntities: false})
 
         chapter.content = $("#text").html()
+        chapter.site = web_site.name
         chapter.need_save = true
 
         // fs.writeFileSync(`${folder}/${chapter.name}.html`, chapter.content)
 
         if(i % 50 == 0)
         {
-            web_site.logs.add(`[${web_site.name}]fetching content ${book.name},count : ${i} / ${book.count},chapter:${chapter.name}`)
+            web_site.logs.add(`[${web_site.name}]fetching content ${book.name},count : ${i} / ${stop},chapter:${chapter.name}`)
         }
     }
+
+    web_site.logs.add(`[${web_site.name}]fetching content ${book.name} done,count : ${start} / ${stop},chapter:${chapter.name}`)
 }
 
 web_site.update = async(book)=>
 {
     let curr_page = 0,total_pages = 100
-    let old_count = book.count
+    let old_count = book.chapters.length
 
     for(let i = 0;i < 1000;++i)             //最多获取1000页
     {
@@ -204,10 +210,10 @@ web_site.update = async(book)=>
         total_pages = info.list.totalPages
     }
 
-    if(book.count > old_count)
+    if(book.chapters.length > old_count)
     {
-        web_site.search_chapters(book,old_count,book.count - 1)
+        web_site.search_chapters(book,old_count,book.chapters.length - 1)
     }
 
-    return book.count > old_count
+    return book.chapters.length > old_count
 }

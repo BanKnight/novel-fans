@@ -166,7 +166,7 @@ me.try_add_book = async(book_name)=>
 
     let sub = subs[the_best_book.site]
 
-    sub.search_chapters(the_best_book,0,the_best_book.count - 1)
+    await sub.search_chapters(the_best_book,0,the_best_book.chapters.length - 1)
 
     md_books.update(the_best_book)
 
@@ -199,15 +199,23 @@ me.search_the_best = async(book_name)=>
         {
             continue
         }
-        if(the_best_book)
+
+        if(the_best_book == null)
         {
-            if(book.chapters.count > the_best_book.chapters.count)
-            {
-                the_best_book = book
-            }
-        }
-        else{
             the_best_book = book
+            continue
+        }
+
+        if(book.chapters.length > the_best_book.chapters.length)
+        {
+            the_best_book = book
+            continue
+        }
+
+        if(subs[book.site].priority > subs[the_best_book.site].priority)
+        {
+            the_best_book = book
+            continue
         }
     }
 
