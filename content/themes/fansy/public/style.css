@@ -1,3 +1,22 @@
-.page-bg {
+
+.bg_gray{
     background-color: #f8f8f8;
+}
+
+.weui_cells_title.inverted
+{
+    background-color: black;
+}
+
+.weui_tab_bd.inverted
+{
+    background-color: black;
+}
+
+.normal {
+	filter: invert(0%);
+}
+
+.inverted {
+    filter: invert(1) grayscale(1) contrast(9);
 }

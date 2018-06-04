@@ -15,16 +15,39 @@
 
     <!-- <link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.2/style/weui.min.css"> -->
     <link rel="stylesheet" href="/public/weuix.min.css">
+    <link rel="stylesheet" href="/public/style.css">
 
     <!-- <script src="https:///cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script> -->
 
+    <script>
+
+        function oppositeColor(a) {
+            a = a.replace('#', '');
+            var c16, c10, max16 = 15, b = [];
+            for (var i = 0; i < a.length; i++) {
+                c16 = parseInt(a.charAt(i), 16);//  to 16进制
+                c10 = parseInt(max16 - c16, 10);// 10进制计算
+                b.push(c10.toString(16)); // to 16进制
+            }
+            return '#' + b.join('');
+        }
+
+        function invert_all() {
+
+            document.documentElement.className = "inverted"
+
+            var d = document.getElementById("d1");
+            //alert(oppositeColor(d.style.color));
+            d.style.background = oppositeColor(d.style.color);
+
+        }
+    </script>
+
 </head>
 
-<body ontouchstart="" style="background-color: #f8f8f8;">
+<body ontouchstart="" class="bg_gray inverted">
     <div class="weui_tab tab-bottom">
         <div class="weui_tab_bd">
-
-
             <div class="weui_panel weui_panel_access">
                 <div class="weui_search_bar">
                     <form class="weui_search_outer">

@@ -10,11 +10,11 @@ const queues = data.queues
 me.start = async()=>
 {
     data.headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36',        
+        'User-Agent':'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
         'Content-Type': 'text/html; charset=utf-8',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-        'Accept-Encoding': 'deflate',
         'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+        'Upgrade-Insecure-Requests': 1,
     }
 
     server.run_revery(80,160,me.update)
@@ -71,8 +71,9 @@ me.do_get_task = (source,task)=>
     let options = {
         url : task.url,
         qs: task.data,
-        timeout: 300,
+        timeout: 1000,
         gzip : true,
+        encoding : null,
         headers : data.headers,
     }
 

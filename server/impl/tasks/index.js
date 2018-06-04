@@ -109,6 +109,15 @@ me.search = async(book_name)=>
     return the_best_book
 }
 
+me.search_site = async(site,book_name)=>
+{
+    let sub = subs[site]
+
+    let book = await sub.search(book_name)
+
+    return book
+}
+
 me.update = async(book)=>
 {
     let is_lock = await md_locks.lock(book.name)

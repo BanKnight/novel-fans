@@ -40,7 +40,7 @@ me.test_timer = function()
 me.test_search_book = async () => {
     // me.test_task()
     // me.test_request()
-    // me.test_my_request()
+    me.test_site_search()
 }
 
 
@@ -57,6 +57,22 @@ me.test_task = async() => {
             md_books.add(book)
         }
     }
+}
+
+me.test_site_search = async()=>{
+    
+    let site = "sogou"
+    let search_name = "修真聊天群"
+    let book = md_books.get(search_name)
+
+    if(book == null)
+    {
+        book = await md_tasks.search_site(site,search_name)
+        if(book)
+        {
+            // md_books.add(book)
+        }
+    } 
 }
 
 me.test_request = () => {
