@@ -30,12 +30,6 @@ web_site.search = async(name)=>
 
     await web_site.search_catalog(book)
 
-    web_site.logs.add(`[${web_site.name}]search_chapters start : ${name}`)
-
-    await web_site.search_chapters(book,0,book.count - 1)
-
-    web_site.logs.add(`[${web_site.name}]search_chapters done : ${name}`)
-
     return book
 }
 
@@ -59,8 +53,6 @@ web_site.search_basic = async(name)=>
     book_html = await web_site.crawler.get(web_site.name,book_ref)
 
     book_html = iconv.decode(book_html,'gb2312'); 
-
-    // fs.writeFileSync("book.html",book_html)
 
     $ = web_site.cheerio.load(book_html,{decodeEntities: false})
 

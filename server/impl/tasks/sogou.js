@@ -28,14 +28,6 @@ web_site.search = async(name)=>
 
     await web_site.search_catalog(book)
 
-    web_site.logs.add(`[${web_site.name}]search_chapters start : ${name}`)
-
-    await web_site.search_chapters(book,0,book.count - 1)
-
-    web_site.logs.add(`[${web_site.name}]search_chapters done : ${name}`)
-
-    delete book.temp
-
     return book
 }
 
