@@ -60,7 +60,7 @@
         <p class="weui_tabbar_label">书架</p>
     </a>
 
-    {{if newer < book.count}}
+    {{if newer < book.chapters.length}}
     <a href="/chapter/{{book.name}}/{{newer}}" class="weui_tabbar_item">
         <div class="weui_tabbar_icon">
             <img src="/public/img/icon_nav_cell.png" alt="">
