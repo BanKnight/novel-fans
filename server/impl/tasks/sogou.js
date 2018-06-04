@@ -69,7 +69,7 @@ web_site.search_catalog = async(book)=>
 {
     let url = `${web_site.url}/h5/cpt/ajax/detail`
 
-    book.chapters = {}
+    book.chapters = []
 
     let curr_page = 0,total_pages = 100
 
@@ -130,13 +130,13 @@ web_site.parse_catalog = (book,items)=>
             return should_continue
         }
 
-        book.chapters[item.index] = {
+        book.chapters.push({
             book : book.name,
             ckey : item.ckey,
             name : item.name,
-            index : item.index,
+            index : parseInt(item.index),
             update : item.updateTime,
-        }
+        })
 
         book.count++
     }

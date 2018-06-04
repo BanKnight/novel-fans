@@ -96,7 +96,7 @@ web_site.search_basic = async(name)=>
 //目录获取：get : https://yd.sogou.com/h5/cpt/ajax/detail，formdata :{bkey : 上面的bkey,p:页码,asc:排序 / desc}
 web_site.search_catalog = async(book)=>
 {
-    book.chapters = {}
+    book.chapters = []
 
     let $ = book.temp.$
     let all_items = $("a",book.temp.catalog_html)
@@ -105,13 +105,13 @@ web_site.search_catalog = async(book)=>
         
         let html = $(this)
 
-        book.chapters[book.count] = {
+        book.chapters.push({
             book : book.name,
             name : html.html(),
             index : book.count,
             update : Date.now(),
             url : `${web_site.url}${html.attr("href")}`,
-        }
+        })
 
         book.count++
     });
