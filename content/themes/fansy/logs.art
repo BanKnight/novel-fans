@@ -1,9 +1,14 @@
 {{extend './layouts/main.art'}}
 
+{{block 'bar_head'}}
+
+    {{include './partials/top_title.art' '日志'}}
+
+
+{{/block}} 
+
 {{block 'bar_body'}}
     <div class="weui_panel_bd">
-        <div class="weui_cells_title">日志</div>
-
         <div class="weui_cells">
             {{each logs log}}
                 {{include './partials/log_card.art' log}}

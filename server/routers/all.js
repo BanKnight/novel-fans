@@ -8,18 +8,31 @@ const md_tasks = server.get("tasks")
 
 routers.get("/",async(ctx,next)=>
 {
-    let info = {
-        books : md_books.get_all()
+
+    if(ctx.user)
+    {
+        ctx.redirect("/books")
     }
-
-    // console.dir(info.books)
-
-    ctx.render("books",info)
+    else
+    {
+        ctx.redirect("/search")
+    }
 })
 
 routers.get("/books",async(ctx,next)=>
 {
-    ctx.redirect("/")
+    let info = {}
+
+    if(ctx.user)
+    {
+        info.books = md_books.get_all()
+    }
+    else
+    {
+        info.books = {}
+    }
+
+    ctx.render("books",info)
 })
 
 routers.get("/catalog/:book_name",async(ctx,next)=>
@@ -66,6 +79,15 @@ routers.get("/logs",async(ctx,next)=>
     ctx.render("logs",info)
 })
 
+routers.get("/search",async(ctx,next)=>
+{
+    let info = {
+        books :md_books.get_all()
+    }
+
+    ctx.render("search",info)
+})
+
 routers.post("/search",async(ctx,next)=>
 {
     let params = ctx.request.body
@@ -86,4 +108,9 @@ routers.post("/search",async(ctx,next)=>
             md_tasks.try_add_book(book_name)
         })
     }
+})
+
+routers.get("/me",async(ctx,next)=>
+{
+    ctx.render("me")
 })

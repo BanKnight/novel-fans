@@ -11,21 +11,21 @@
 {{/block}} 
 
 {{block 'bar_footer'}}
-<a href="javascript:scroll_bar_body_top()" class="weui_tabbar_item weui_bar_item_on">
+<a href="javascript:scroll_bar_body_top()" class="weui_tabbar_item">
     <div class="weui_tabbar_icon">
         <img src="/public/img/icon_nav_button.png" alt="">
     </div>
     <p class="weui_tabbar_label">顶部</p>
 </a>
 
-<a href="javascript:history.back()" class="weui_tabbar_item weui_bar_item_on">
+<a href="javascript:history.back()" class="weui_tabbar_item">
     <div class="weui_tabbar_icon">
         <img src="/public/img/icon_nav_button.png" alt="">
     </div>
     <p class="weui_tabbar_label">返回</p>
 </a>
 
-<a href="javascript:scroll_bar_body_bottom()" class="weui_tabbar_item weui_bar_item_on">
+<a href="javascript:scroll_bar_body_bottom()" class="weui_tabbar_item">
     <div class="weui_tabbar_icon">
         <img src="/public/img/icon_nav_button.png" alt="">
     </div>

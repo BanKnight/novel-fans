@@ -1,0 +1,23 @@
+{{extend './layouts/main.art'}}
+
+{{block 'bar_head'}}
+
+{{include './partials/top_title.art' '我'}}
+
+
+{{/block}} 
+
+{{block 'bar_body'}}
+    <div class="weui_panel_bd">
+ 
+    </div>
+
+{{/block}}
+
+{{block 'page_footer'}}
+
+    <script>
+        turn_bar_on("me")
+    </script>
+
+{{/block}}

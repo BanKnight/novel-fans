@@ -24,9 +24,11 @@
 
 </head>
 
-<body ontouchstart="" class="bg_gray">
+<body ontouchstart="" class="inverted">
 
-    <div class="weui_tab tab-bottom">
+    <div class="bg_gray" style="min-height:100%">
+
+        <div class="weui_tab tab-bottom">
             {{block 'bar_head'}}
             {{/block}}
     
@@ -54,7 +56,7 @@
             </script>
             <div class="weui_tabbar" id="bar_footer">
                 {{block 'bar_footer'}}
-                <a href="/" class="weui_tabbar_item" id="books">
+                <a href="/books" class="weui_tabbar_item" id="books">
                     <div class="weui_tabbar_icon">
                         <img src="/public/img/icon_nav_button.png" alt="">
                     </div>
@@ -97,6 +99,8 @@
         </div>
         {{block 'page_footer'}} {{/block}}
 
+    </div>
+    
     
 </body>
 

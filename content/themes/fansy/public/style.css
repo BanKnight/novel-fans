@@ -18,5 +18,16 @@
 }
 
 .inverted {
-    filter: invert(1) grayscale(1) contrast(9);
+    filter: invert(1)
+}
+
+.bg-black{
+    background-color:#3d4145
+}
+.bg-black:not(.weui_btn_disabled):visited{
+    color:#fff
+}
+.bg-black:not(.weui_btn_disabled):active{
+    color:rgba(255,255,255,0.4);
+    background-color:#18b4ed
 }

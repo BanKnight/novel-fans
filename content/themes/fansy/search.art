@@ -1,0 +1,58 @@
+{{extend './layouts/main.art'}} 
+
+{{block 'bar_head'}}
+
+{{include './partials/top_title.art' '发现'}}
+
+{{/block}} 
+
+{{block 'bar_body'}}
+
+<div class="weui_panel weui_panel_access">
+
+    <div class="weui_search_bar">
+        <input type="search" id="search_content" name="search" class="search-input" id="search" placeholder="关键字" style="box-sizing:content-box">
+        <button class="weui_btn weui_btn_mini weui_btn_primary" onclick="search()">
+            <i class="icon icon-4"></i>
+        </button>
+    </div>
+
+    <script>
+        function search()
+        {
+            let content = $("#search_content").val()
+
+            console.log("content is:" + content)
+            
+            $.post({
+                url : "/search",
+                dataType: 'json',
+                data : {keyword : content},
+                success:function(data){
+
+                    $.toast(data.msg)
+                    // console.dir(data)
+                },
+                error:function(e){                    
+                    $.toast("操作失败","cancle")
+                }
+            })
+
+        }
+    </script>
+
+    <div class="weui_panel_bd">
+        {{each books book name}} {{include './partials/book_card.art' book}} {{/each}}
+    </div>
+</div>
+
+
+{{/block}} 
+
+{{block 'page_footer'}}
+
+<script>
+    turn_bar_on("search")
+</script> 
+
+{{/block}}
