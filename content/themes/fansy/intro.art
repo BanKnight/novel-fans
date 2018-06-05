@@ -1,0 +1,34 @@
+{{extend './layouts/main.art'}}
+
+{{block 'bar_body'}}
+    <div class="weui_panel weui_panel_access">
+        <div class="weui_panel_bd">
+
+            <div class="weui_media_box weui_media_text">
+                <h4 class="weui_media_title">{{book.name}}</h4>
+
+                <ul class="weui_media_info">
+                        <li class="weui_media_info_meta">{{book.author}}</li>
+                        <li class="weui_media_info_meta">{{book.site}}</li>
+                        <li class="weui_media_info_meta weui_media_info_meta_extra">{{book.create | moment 'YYYY-MM-DD HH:mm:ss'}}</li>
+                    </ul>
+
+                <p>{{book.summary}}</p>
+            </div>
+        </div>
+
+        <a href="/catalog/{{book.name}}" class="weui_panel_ft">查看目录</a>
+    </div>
+
+{{/block}}
+
+{{block 'bar_footer'}}
+
+    <a href="javascript:history.back()" class="weui_tabbar_item weui_bar_item_on">
+        <div class="weui_tabbar_icon">
+            <img src="/public/img/icon_nav_button.png" alt="">
+        </div>
+        <p class="weui_tabbar_label">返回</p>
+    </a>
+
+{{/block}}

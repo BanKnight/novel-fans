@@ -22,6 +22,7 @@ me.start = async()=>
             author : db_one_data.author,
             summary : db_one_data.summary,
             site : db_one_data.site,
+            create : db_one_data.create || Date.now(),
             last : db_one_data.last || 0,
 
             chapters : [],
@@ -99,11 +100,14 @@ me.add = (book)=>
 
     data[book.name] = book
 
+    book.create = book.create || Date.now()
+
     {   // basic
         const db = {
             author : book.author,
             summary : book.summary,
             site : book.site,
+            create : book.create,
             last : book.last || Date.now(),
         }
 

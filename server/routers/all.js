@@ -8,8 +8,16 @@ const md_tasks = server.get("tasks")
 
 routers.get("/",async(ctx,next)=>
 {
+    let session = ctx.session
+    let has_read_something = false
 
-    if(ctx.user)
+    for(let key in session.reading)
+    {
+        has_read_something = true
+        break
+    }
+
+    if(has_read_something)
     {
         ctx.redirect("/books")
     }
@@ -29,7 +37,24 @@ routers.get("/books",async(ctx,next)=>
     }
     else
     {
+        let session = ctx.session
+        let reading = session.reading
+
         info.books = {}
+
+        for(let book_name in reading)
+        {
+            let read = reading[book_name]
+            let book = md_books.get(book_name)
+
+            if(book)
+            {
+                info.books[book_name] = {
+                    book : book,
+                    read : read,
+                }
+            }
+        }
     }
 
     ctx.render("books",info)
@@ -51,15 +76,48 @@ routers.get("/catalog/:book_name",async(ctx,next)=>
     ctx.render("catalog",info)
 })
 
+routers.get("/chapter/:book_name/last_read",async(ctx,next)=>
+{
+    let book = md_books.get(ctx.params.book_name)
+
+    if(book == null)
+    {
+        return
+    }
+
+    let session = ctx.session
+    let chapter_index = 0
+
+    let read_info = session.reading[book.name]
+    if(read_info)
+    {
+        chapter_index = read_info.chapter
+    }
+
+    chapter_index = Math.max(chapter_index,0)
+    chapter_index = Math.min(chapter_index,book.chapters.length - 1)
+
+    ctx.redirect(`/chapter/${book.name}/${chapter_index}`)
+})
+
 routers.get("/chapter/:book_name/:chapter_index",async(ctx,next)=>
 {
     let book = md_books.get(ctx.params.book_name)
-    let chapter = null
 
-    if(book)
+    if(book == null)
     {
-        chapter = book.chapters[parseInt(ctx.params.chapter_index)]
+        return
     }
+
+    let index = parseInt(ctx.params.chapter_index)
+    let chapter = book.chapters[index]
+
+    if(chapter == null)
+    {
+        return
+    }
+
+    console.log("read chapter")
 
     let info = {
         book : book,
@@ -67,7 +125,29 @@ routers.get("/chapter/:book_name/:chapter_index",async(ctx,next)=>
         index : chapter.index,
     }
 
+    let session = ctx.session
+
+    session.reading[book.name] = {
+        chapter : index,
+    }
+
     ctx.render("chapter",info)
+})
+
+routers.get("/intro/:book_name",async(ctx,next)=>
+{
+    let book = md_books.get(ctx.params.book_name)
+    if(book == null)
+    {
+        return
+    }
+
+    let info = {
+        book : book,
+        chapter : book.chapters[book.chapters.length - 1],
+    }
+
+    ctx.render("intro",info)
 })
 
 routers.get("/logs",async(ctx,next)=>
