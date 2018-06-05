@@ -22,6 +22,7 @@ me.start = async()=>
             author : db_one_data.author,
             summary : db_one_data.summary,
             site : db_one_data.site,
+            url : db_one_data.url,
             create : db_one_data.create || Date.now(),
             last : db_one_data.last || 0,
 
@@ -69,7 +70,7 @@ me.start = async()=>
 
     console.log(`has ready load ${db_data.length} chapters`)
 
-    // server.run_revery(10 * 60 * 1000,20 * 60 * 1000,me.check_update)
+    server.run_revery(10 * 60 * 1000,20 * 60 * 1000,me.check_update)
 
     return true
 }
@@ -107,6 +108,7 @@ me.add = (book)=>
             author : book.author,
             summary : book.summary,
             site : book.site,
+            url : book.url,
             create : book.create,
             last : book.last || Date.now(),
         }
@@ -124,11 +126,6 @@ me.add = (book)=>
             content : chapter.content
         }
 
-        if(typeof(index) != "number")
-        {
-            console.log("index is not number:" + typeof(index))
-        }
-
         md_db.upsert("chapter",{book : book.name,index : index},db)
     }
 
@@ -137,7 +134,6 @@ me.add = (book)=>
 // 用于一本小说有更新后，写入更新的部分到db
 me.update = (book)=>
 {
-
     md_logs.add(`${book.name} begin to update to db`)
 
     let update_count = 0
@@ -157,7 +153,8 @@ me.update = (book)=>
             const db = {
                 name : chapter.name,
                 site : chapter.site,
-                content : chapter.content
+                content : chapter.content,
+                url : chapter.url,
             }
 
             chapter.need_save = null
@@ -169,6 +166,10 @@ me.update = (book)=>
             break
         }
     }
+
+    book.last = Date.now()      //上次更新的时间
+
+    md_db.upsert("basic",{_id : book.name},{last : book.last})
 
     md_logs.add(`${book.name} update:${update_count} chapters`)
 }

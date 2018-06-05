@@ -1,4 +1,12 @@
-<div class="weui_media_box weui_media_text" onclick="javascript:location.href='/chapter/{{book.name}}/{{read.chapter}}' ">
-    <h4 class="weui_media_title">{{book.name}}</h4>
-    <p class="weui_media_desc">{{book.summary}}</p>
+<div class="weui_media_box weui_media_text" onclick="javascript:location.href='/chapter/{{book.name}}/{{chapter.index}}' ">
+    <h4 class="weui_media_title">{{book.name}}
+        {{if updated}}
+        <span class="weui-badge" style="margin-left: 5px;">New</span>
+        {{/if}}
+    </h4>
+    <p class="weui_media_desc">最新章节:{{chapter.name}}</p>
+    <ul class="weui_media_info">
+        <li class="weui_media_info_meta">{{chapter.index}}/{{book.chapters.length}}</li>
+        <li class="weui_media_info_meta weui_media_info_meta_extra">{{book.last | from_now}}</li>
+    </ul>
 </div>

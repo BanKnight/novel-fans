@@ -51,11 +51,16 @@ routers.get("/books",async(ctx,next)=>
             let read = reading[book_name]
             let book = md_books.get(book_name)
 
+            read.time = read.time || 0
+
             if(book)
             {
+                let chapter = book.chapters[read.chapter]
+
                 info.books[book_name] = {
                     book : book,
-                    read : read,
+                    chapter : chapter,
+                    updated : (book.last > read.time)
                 }
             }
         }
@@ -130,10 +135,16 @@ routers.get("/chapter/:book_name/:chapter_index",async(ctx,next)=>
     }
 
     let session = ctx.session
+    let read_info = session.reading[book.name]
 
-    session.reading[book.name] = {
-        chapter : index,
+    if(read_info == null)
+    {
+        read_info = {}
+        session.reading[book.name] = read_info
     }
+
+    read_info.chapter = index
+    read_info.time = Date.now()
 
     ctx.render("chapter",info)
 })

@@ -16,9 +16,21 @@ web_site.init = (env)=>
 
 web_site.search = async(name)=>
 {
-    web_site.logs.add(`[${web_site.name}]search_basic start : ${name}`)
+    web_site.logs.add(`[${web_site.name}]search_link start : ${name}`)
 
-    let book = await web_site.search_basic(name)
+    let book_url = await web_site.search_link(name)
+    if(book_url == null)
+    {
+        web_site.logs.add(`[${web_site.name}] no such book : ${name}`)
+        return
+    }
+
+    let book = await web_site.search_basic(book_url)
+    if(book == null)
+    {
+        web_site.logs.add(`[${web_site.name}] no such book : ${name}`)
+        return 
+    }
 
     if(book.name != name)
     {
@@ -33,28 +45,39 @@ web_site.search = async(name)=>
     return book
 }
 
-web_site.search_basic = async(name)=>
+web_site.search_link = async(name)=>
 {
-    let url = `${web_site.url}/search.php`
+    try
+    {
+        let url = `${web_site.url}/search.php`
 
+        let body = await web_site.crawler.get(web_site.name,url,{keyword : name})
+    
+        let $ = web_site.cheerio.load(body,{decodeEntities: false})
+    
+        let first_result = $(".am-result-item.result-game-item")[0]
+        let book_html = $(".result-game-item-title-link",first_result)
+    
+        let book_ref = book_html.attr("href")
+    
+        return book_ref
+    }
+    catch(err)
+    {
+        return
+    }
+
+}
+
+web_site.search_basic = async(url)=>
+{
     // console.log("url is : " + url)
 
-    let body = await web_site.crawler.get(web_site.name,url,{keyword : name})
-
-    let $ = web_site.cheerio.load(body,{decodeEntities: false})
-
-    let first_result = $(".am-result-item.result-game-item")[0]
-    let book_html = $(".result-game-item-title-link",first_result)
-
-    let book_ref = book_html.attr("href")
-
-    // console.log("book ref is:" + book_ref)
-
-    book_html = await web_site.crawler.get(web_site.name,book_ref)
+    let book_html = await web_site.crawler.get(web_site.name,url)
 
     book_html = iconv.decode(book_html,'gb2312'); 
 
-    $ = web_site.cheerio.load(book_html,{decodeEntities: false})
+    let $ = web_site.cheerio.load(book_html,{decodeEntities: false})
 
     let basic_html = $("#info")
 
@@ -71,9 +94,9 @@ web_site.search_basic = async(name)=>
         site : web_site.name,
         author : author_html.html().split("：")[1],
         summary : del_html_tag(summary_html.html()),
-
+        url : url,
         temp :{
-            url:book_ref,                   
+            url:url,                   
             catalog_html : catalog_html,//用来抓取目录
             $ : $,
         }
@@ -142,45 +165,36 @@ web_site.search_chapters = async(book,start,stop)=>
 
 web_site.update = async(book)=>
 {
-    // let curr_page = 0,total_pages = 100
-    // let old_count = book.count
+    let url = book.url
 
-    // for(let i = 0;i < 1000;++i)             //最多获取1000页
-    // {
-    //     curr_page ++
+    if(url == null || book.site != web_site.name)
+    {
+        url = await web_site.search_link(book.name)
 
-    //     if(curr_page > total_pages)
-    //     {
-    //         break
-    //     }
+        book.url = url
+    }
 
-    //     let body = await web_site.crawler.get(web_site.name,url,{bkey:book.bkey,p : curr_page,asc:"desc"})
+    let that_book = await web_site.search_basic(url)
+    if(that_book == null)
+    {
+        return false
+    }
 
-    //     let info = JSON.parse(body)
+    await web_site.search_catalog(that_book)
 
-    //     try
-    //     {
-    //         // console.log(`parsing page,page:${info.list.curPage},total:${info.list.totalPages}`)
+    if(that_book.chapters.length <= book.chapters.length)
+    {
+        return false
+    }
 
-    //         if(web_site.parse_catalog(book,info.list.items) == false)
-    //         {
-    //             break
-    //         }
-    //     }
-    //     catch(err)
-    //     {
-    //         console.log(err)
-    //         break
-    //     }
- 
-    //     curr_page = info.list.curPage
-    //     total_pages = info.list.totalPages
-    // }
+    await web_site.search_chapters(book.chapters.length,that_book.chapters.length - 1)
 
-    // if(book.count > old_count)
-    // {
-    //     web_site.search_chapters(book,old_count,book.count - 1)
-    // }
+    for(let i = book.chapters.length,len = that_book.chapters.length;i < len;++i)
+    {
+        let new_chapter = that_book.chapters[i]
 
-    // return book.count > old_count
+        book.chapters.push(new_chapter)
+    }
+
+    return true
 }

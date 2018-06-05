@@ -19,6 +19,11 @@ template.defaults.imports.moment = function(content,format_str)
     return moment(content).format(format_str)
 }
 
+template.defaults.imports.from_now = function(content)
+{
+    return moment(content).fromNow()
+}
+
 let views_path = path.resolve(config.content,"themes",config.theme || "default")
 
 {

@@ -18,8 +18,6 @@ me.start = async()=>
 {
     console.log("start tasks!!!")
 
-    // server.run_every(2 * 60 * 1000,me.update)
-
     const blacks = ['index']
 
     const file_or_folders = fs.readdirSync(__dirname)
