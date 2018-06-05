@@ -174,6 +174,8 @@ web_site.update = async(book)=>
         book.url = url
     }
 
+    web_site.logs.add(`[${web_site.name}][${book.name}] get url:${url}`)
+
     let that_book = await web_site.search_basic(url)
     if(that_book == null)
     {
@@ -184,10 +186,14 @@ web_site.update = async(book)=>
 
     if(that_book.chapters.length <= book.chapters.length)
     {
+        web_site.logs.add(`[${web_site.name}][${book.name}] no need to update`)
+
         return false
     }
 
-    await web_site.search_chapters(book.chapters.length,that_book.chapters.length - 1)
+    await web_site.search_chapters(that_book,book.chapters.length,that_book.chapters.length - 1)
+
+    web_site.logs.add(`[${web_site.name}][${book.name}] check update done,${book.chapters.length} => ${that_book.chapters.length}`)
 
     for(let i = book.chapters.length,len = that_book.chapters.length;i < len;++i)
     {

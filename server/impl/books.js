@@ -70,7 +70,7 @@ me.start = async()=>
 
     console.log(`has ready load ${db_data.length} chapters`)
 
-    server.run_revery(10 * 60 * 1000,20 * 60 * 1000,me.check_update)
+    server.run_revery(20 * 60 * 1000,30 * 60 * 1000,me.check_update)
 
     return true
 }
@@ -82,6 +82,8 @@ me.chapter_cmp = (first,second)=>
 
 me.check_update = async()=>
 {
+    md_logs.add("checking books")
+
     for(let name in data)
     {
         let book = data[name]
