@@ -91,17 +91,17 @@
         let middle_range = [window.innerWidth * 0.3 + 1, window.innerWidth * 0.7]
         let right_range = [window.innerWidth * 0.7 + 1, window.innerWidth]
     
-        that_bar_body.click((e)=>
-        {
-            if(e.clientX < left_range[1])
-            {
-                that_bar_body.scrollTop(that_bar_body.scrollTop() - page_height)
-            }
-            else if(e.clientX > right_range[0])
-            {
-                that_bar_body.scrollTop(that_bar_body.scrollTop() + page_height)
-            }
-        })
+        // that_bar_body.click((e)=>
+        // {
+        //     if(e.clientX < left_range[1])
+        //     {
+        //         that_bar_body.scrollTop(that_bar_body.scrollTop() - page_height)
+        //     }
+        //     else if(e.clientX > right_range[0])
+        //     {
+        //         that_bar_body.scrollTop(that_bar_body.scrollTop() + page_height)
+        //     }
+        // })
     
     </script>
 {{/block}}
