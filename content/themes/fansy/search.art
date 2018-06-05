@@ -1,40 +1,60 @@
 {{extend './layouts/main.art'}} 
 
-{{block 'bar_head'}}
-
-{{include './partials/top_title.art' '发现'}}
-
-{{/block}} 
-
-{{block 'bar_body'}}
+{{block 'bar_head'}} {{include './partials/top_title.art' '发现'}} {{/block}} {{block 'bar_body'}}
 
 <div class="weui_panel weui_panel_access">
 
-    <div class="weui_search_bar">
-        <input type="search" id="search_content" name="search" class="search-input" id="search" placeholder="关键字" style="box-sizing:content-box">
-        <button class="weui_btn weui_btn_mini weui_btn_primary" onclick="search()">
-            <i class="icon icon-4"></i>
-        </button>
+    <div class="searchbar_wrap">
+        <div class="weui_search_bar">
+        </div>
     </div>
-
     <script>
-        function search()
-        {
-            let content = $("#search_content").val()
+
+        $('.searchbar_wrap').searchBar({
+            cancelText:"取消",
+            searchText:'关键字',
+            onfocus: function (value) {
+                console.log("onfocus")
+
+            },
+            onblur:function(value) {
+                console.log("onblur")
+
+            },
+            input: function(value) {
+                console.log("input")
+
+            },
+            onsubmit:function(value){
+                search()
+            },
+            oncancel:function(target){
+                console.log("cancel")
+                target.val("")
+            },
+        
+            onclear:function(){
+                console.log("onclear")
+
+            }
+        });
+
+        function search() {
+            let content = $("#weui_search_input").val()
 
             console.log("content is:" + content)
-            
+
             $.post({
-                url : "/search",
+                url: "/search",
                 dataType: 'json',
-                data : {keyword : content},
-                success:function(data){
+                data: { keyword: content },
+                success: function (data) {
 
                     $.toast(data.msg)
                     // console.dir(data)
                 },
-                error:function(e){                    
-                    $.toast("操作失败","cancle")
+                error: function (e) {
+                    $.toast("操作失败", "cancle")
                 }
             })
 
@@ -47,12 +67,8 @@
 </div>
 
 
-{{/block}} 
-
-{{block 'page_footer'}}
+{{/block}} {{block 'page_footer'}}
 
 <script>
     turn_bar_on("search")
-</script> 
-
-{{/block}}
+</script> {{/block}}

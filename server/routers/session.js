@@ -9,7 +9,7 @@ const md_users = server.get("users")
 const md_sessions = server.get("sessions")
 
 let cookie = {
-    maxAge: 3600 * 24 * 30, // cookie有效时长
+    maxAge: 1000 * 3600 * 24 * 30, // cookie有效时长
   }
 
 const session_router = session({
