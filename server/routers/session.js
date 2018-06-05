@@ -26,7 +26,7 @@ function try_init_session(ctx,next)
 
     let session = ctx.session
 
-    console.log("init_session")
+    // console.log("init_session")
 
     //正在读的书 [name] = {chapter:index}
     session.reading = session.reading || {
