@@ -16,7 +16,7 @@ me.start = async function()
     {
         var db_one = sessions[i]
 
-        data[db_one._id] = db_one.val
+        data.sessions[db_one._id] = db_one.val
     }
 
     console.log("finish loading sessions")
@@ -27,19 +27,19 @@ me.start = async function()
 
 me.get = async function(id)
 {
-    return data[id]
+    return data.sessions[id]
 }
 
-me.set = async function(id,val)
+me.set = async function(id,val,timeout)
 {
-    data[id] = val
+    data.sessions[id] = val
 
-    md_db.upsert("sessions",{_id:id},{val : val})
+    md_db.upsert("sessions",{_id:id},{val : val,expired : Date.now() + timeout / 1000})
 }
 
 me.destroy = async function(id)
 {
-    delete data[id]
+    delete data.sessions[id]
 
     md_db.remove("sessions",{_id:id})
 }
