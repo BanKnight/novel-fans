@@ -1,3 +1,0 @@
-<div class="weui-header bg-green" style="height:40px">
-    <h1 class="weui-header-title">{{$data}}</h1>
-</div>
