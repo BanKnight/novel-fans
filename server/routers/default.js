@@ -31,7 +31,6 @@ routers.use(convert(limit({
   })))
 
 
-routers.use(helmet.noCache())           //浏览器不要缓存
 routers.use(helmet.noSniff())           
 routers.use(helmet.frameguard())         
 routers.use(helmet.xssFilter())         

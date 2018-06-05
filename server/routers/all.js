@@ -1,3 +1,5 @@
+const helmet = require('koa-helmet')
+
 const server = global.server
 const app = server.app
 const routers = server.routers
@@ -5,6 +7,8 @@ const routers = server.routers
 const md_books = server.get("books")
 const md_logs = server.get("logs")
 const md_tasks = server.get("tasks")
+
+routers.use(helmet.noCache())           //浏览器不要缓存
 
 routers.get("/",async(ctx,next)=>
 {
