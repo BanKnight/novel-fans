@@ -19,14 +19,54 @@
     <link rel="stylesheet" href="/public/style.css">
 
     <script src="https:///cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/public/fansy.js"></script>
 
     <script src="/public/zepto.min.js"></script> {{block 'page_head'}} {{/block}}
 
 </head>
 
-<body ontouchstart="" class="inverted">
+<body ontouchstart="">
 
-    <div class="bg_gray" style="min-height:100%">
+    <div class="bg_gray" style="min-height:100%" id = "page">
+
+            <script>
+                    function turn_theme_to(theme_name)
+                    {
+                        let e = $("#page")
+                        theme_name = theme_name || "light" 
+            
+                        e.removeClass("inverted")
+            
+                        if(theme_name == "dark")
+                        {
+                            e.addClass("inverted")
+                        }
+            
+                        utils.set_storage("theme",theme_name)
+                    }
+            
+                    function switch_theme()
+                    {
+                        let e = $("#page")
+                        let curr_theme = utils.get_storage("theme")
+            
+                        if(curr_theme == null || curr_theme == "light")
+                        {
+                            curr_theme = "dark"
+                        }
+                        else
+                        {
+                            curr_theme = "light"
+                        }
+            
+                        turn_theme_to(curr_theme)
+                    }
+                
+                    utils.init()
+            
+                    turn_theme_to(utils.get_storage("theme"))
+            
+                </script>
 
         <div class="weui_tab tab-bottom">
             {{block 'bar_head'}}
@@ -100,8 +140,7 @@
         {{block 'page_footer'}} {{/block}}
 
     </div>
-    
-    
+
 </body>
 
 </html>
