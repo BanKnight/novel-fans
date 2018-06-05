@@ -205,8 +205,7 @@ routers.post("/search",async(ctx,next)=>
     }
 })
 
-if(process.env.NODE_ENV != "production")
-{
+
     
 const cmds = {}
 
@@ -222,40 +221,46 @@ cmds.set = function()
 
 }
 
-    routers.post("/debug",async(ctx,next)=>
+routers.post("/debug",async(ctx,next)=>
+{
+    let params = ctx.request.body
+    let cmd = params.cmd
+    let arg = params.arg
+    let secret = params.secret
+
+    if(secret != 10086)
     {
-        let params = ctx.request.body
-        let cmd = params.cmd
-        let arg = params.arg
-    
-        console.dir(params)
-    
-        try
+        return
+    }
+
+    console.dir(params)
+
+    try
+    {
+        let cmd_func = cmds[cmd]
+        if(cmd_func == null)
         {
-            let cmd_func = cmds[cmd]
-            if(cmd_func == null)
-            {
-                ctx.body = {result:false,reason:"no such cmd"}
-                return
-            }
-        
-            let result = cmd_func(arg)
-            if(result)
-            {
-                console.dir(result)
-                ctx.body = {result:true,data : result}
-                return 
-            }
-        
-            ctx.body = {result:true,data:"no result"}
+            ctx.body = {result:false,reason:"no such cmd"}
+            return
         }
-        catch(err)
+    
+        let result = cmd_func(arg)
+        if(result)
         {
-            console.log(err)
-            ctx.body = {result:false,reason:err}
+            console.dir(result)
+            ctx.body = {result:true,data : result}
+            return 
         }
-    })
-}
+    
+        ctx.body = {result:true,data:"no result"}
+    }
+    catch(err)
+    {
+        console.log(err)
+        ctx.body = {result:false,reason:err}
+    }
+})
+
 routers.get("/me",async(ctx,next)=>
 {
     ctx.render("me")
