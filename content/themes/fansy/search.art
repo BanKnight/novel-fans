@@ -16,19 +16,16 @@
 
             },
             onblur:function(value) {
-                console.log("onblur")
 
             },
             input: function(value) {
-                console.log("input")
 
             },
             onsubmit:function(value){
                 search()
             },
             oncancel:function(target){
-                console.log("cancel")
-                target.val("")
+  
             },
         
             onclear:function(){

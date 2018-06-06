@@ -1,11 +1,12 @@
-<div class="weui_media_box weui_media_text" onclick="javascript:location.href='/chapter/{{book.name}}/{{chapter.index}}' ">
+<div class="weui_media_box weui_media_text" id="{{book.name}}">
     <h4 class="weui_media_title">{{book.name}}
         {{if updated}}
-        <span class="weui-badge" style="margin-left: 5px;">New</span>
+        <span class="weui-badge weui-badge-dot" style="margin-left: 5px;">New</span>
         {{/if}}
+        <span class="weui-badge weui-badge-dot" style="margin-left: 5px;" onclick="del_book('{{book.name}}')">删除</span>
     </h4>
     <p class="weui_media_desc">最新章节:{{chapter.name}}</p>
-    <ul class="weui_media_info">
+    <ul class="weui_media_info" onclick="javascript:location.href='/chapter/{{book.name}}/{{chapter.index}}' ">
         <li class="weui_media_info_meta">{{chapter.index}}/{{book.chapters.length}}</li>
         <li class="weui_media_info_meta weui_media_info_meta_extra">{{book.last | from_now}}</li>
     </ul>

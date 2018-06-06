@@ -18,4 +18,30 @@
 
 <script>
     turn_bar_on("books")
-</script> {{/block}}
+
+    function del_book(book_name)
+    {
+        $.confirm("您确定要删除吗?", "确认删除?", function() {
+
+            $.ajax({
+                url: "/book",
+                type:"delete",
+                dataType: 'json',
+                data: { name: book_name },
+                success: function (data) {
+                    $.toast("操作成功")
+                    $(`#${book_name}`).remove()
+                },
+                error: function (e) {
+                    $.toast("操作失败", "cancle")
+                }
+            })
+          $.toast("删除成功!");
+        }, function() {
+          //取消操作
+        });
+
+    }
+</script> 
+
+{{/block}}

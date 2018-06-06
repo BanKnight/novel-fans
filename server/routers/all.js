@@ -95,6 +95,17 @@ routers.get("/catalog/:book_name",async(ctx,next)=>
     ctx.render("catalog",info)
 })
 
+routers.del("/book",async(ctx,next)=>
+{
+    let session = ctx.session
+
+    console.log(`delete my books ${ctx.request.body.name}`)
+
+    delete session.reading[ctx.request.body.name]
+
+    ctx.body = {is_ok:true}
+})
+
 routers.get("/chapter/:book_name/last_read",async(ctx,next)=>
 {
     let book = md_books.get(ctx.params.book_name)
