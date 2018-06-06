@@ -8,7 +8,7 @@ const data = me.data
 
 me.start = async function()
 {
-    //console.log("start to load sessions")
+    console.log("start to load sessions")
 
     let now = Date.now()
 
@@ -27,13 +27,13 @@ me.start = async function()
             delete data.sessions[id]
             delete data.timeouts[id]
 
-            //console.log(`expired session ok 1:${id}`)
+            console.log(`expired session ok 1:${id}`)
     
             md_db.remove("sessions",{_id:id})
         })
     }
 
-    //console.log("finish loading sessions")
+    console.log("finish loading sessions")
     console.dir(data)
 
     return true
@@ -44,11 +44,11 @@ me.get = async function(id)
     let val = data.sessions[id]
     if(val)
     {
-        //console.log(`get session ok:${id}`)
+        console.log(`get session ok:${id}`)
     }
     else
     {
-        //console.log(`get session failed:${id}`)
+        console.log(`get session failed:${id}`)
     }
     return data.sessions[id]
 }
@@ -57,7 +57,7 @@ me.set = async function(id,val,timeout)
 {
     if (id in data.timeouts) clearTimeout(data.timeouts[id]);
 
-    //console.log(`set session ${id},${timeout},${typeof(timeout)}，${timeout > 5000}`)
+    console.log(`set session ${id},${timeout},${typeof(timeout)}，${timeout > 5000}`)
 
     data.sessions[id] = val
     data.timeouts[id] = server.run_after(timeout,()=>
@@ -67,7 +67,7 @@ me.set = async function(id,val,timeout)
 
         md_db.remove("sessions",{_id:id})
 
-        //console.log(`expired session ok:${id},${timeout}`)
+        console.log(`expired session ok:${id},${timeout}`)
 
     })
 
@@ -81,7 +81,7 @@ me.destroy = async function(id)
     delete data.sessions[id]
     delete data.timeouts[id]
 
-    //console.log(`destroy session ${id}`)
+    console.log(`destroy session ${id}`)
 
     md_db.remove("sessions",{_id:id})
 }
