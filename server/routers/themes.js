@@ -43,7 +43,7 @@ let views_path = path.resolve(config.content,"themes",config.theme || "default")
 
     let theme = path.resolve(views_path,"public")
     
-    app.use(static(theme,{prefix:"/public/",buffer:true,maxAge: 30 * 24 * 60 * 60,gzip:true,dynamic:true,files:files}))
+    app.use(static(theme,{prefix:"/public/",buffer:true,maxAge: 365 * 24 * 60 * 60,gzip:true,dynamic:true,files:files}))
 }
 if(process.env != "production")
 {//admin static
