@@ -204,26 +204,48 @@ routers.get("/search",async(ctx,next)=>
     ctx.render("search",info)
 })
 
-routers.post("/search",async(ctx,next)=>
+routers.get("/search/:keyword",async(ctx,next)=>
 {
-    let params = ctx.request.body
-    let book_name = params.keyword
+    let book_name = ctx.params.keyword
 
     console.log("get a searching task : " + book_name)
 
     if(md_books.get(book_name))
     {
-        ctx.body = {is_ok : true ,msg : "这本书已经存在"}
-    }
-    else
-    {
-        ctx.body = {is_ok : true ,msg : "这本书正在后台收录中"}
+        ctx.body = {redirect : `/intro/${book_name}`}
 
-        setImmediate(async()=>
-        {
-            md_tasks.try_add_book(book_name)
-        })
+        return
     }
+
+    let book = null
+
+    setImmediate(async()=>
+    {
+        book = await md_tasks.try_add_book(book_name)
+    })
+
+    console.log(`time 1:${Date.now()}`)
+
+    for(let i = 0;i < 300;++i)
+    {
+        await server.sleep(10)
+        if(book != null)
+        {
+            console.log(`break because of time,${i}`)
+            break
+        }
+    }
+
+    console.log(`time 2:${Date.now()},${typeof(book)},${book}`)
+
+    if(!book)
+    {
+        console.log("no such book 2")
+        ctx.body = {is_ok : true ,msg : "查无此书"}    
+        return
+    }
+
+    ctx.body = {redirect : `/intro/${book_name}`}
 })
 
 

@@ -147,30 +147,38 @@ me.try_add_book = async(book_name)=>
 
     if(is_lock !== true)        //已经有任务在搜索了 直接返回
     {
-        return
+        return false
     }
 
     md_logs.add(`new searching task:${book_name}`)
 
-
     let the_best_book = await me.search_the_best(book_name)
 
-    if(md_books.get(book_name) || the_best_book == null)
+    if(the_best_book == null)
     {
         md_locks.unlock(book_name,false)        //让那些等待锁的 都返回false
 
-        return
+        console.log("no such book 1")
+
+        return false
     }
 
     md_books.add(the_best_book)
 
-    let sub = subs[the_best_book.site]
+    setImmediate(async()=>
+    {
+        let sub = subs[the_best_book.site]
 
-    await sub.search_chapters(the_best_book,0,the_best_book.chapters.length - 1)
+        await sub.search_chapters(the_best_book,0,the_best_book.chapters.length - 1)
 
-    md_books.update(the_best_book)
+        md_books.update(the_best_book)
+    
+        md_locks.unlock(book_name,false)        //让那些等待锁的 都返回false
+    })
 
-    md_locks.unlock(book_name,false)        //让那些等待锁的 都返回false
+    console.log(`has this book ${book_name}`)
+
+    return the_best_book
 }
 
 me.search_the_best = async(book_name)=>

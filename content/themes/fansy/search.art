@@ -35,20 +35,31 @@
         });
 
         function search() {
+
             let content = $("#weui_search_input").val()
 
             console.log("content is:" + content)
 
-            $.post({
-                url: "/search",
-                dataType: 'json',
-                data: { keyword: content },
+            $.showLoading()
+
+            $.get({
+                url: `/search/${content}`,
                 success: function (data) {
 
-                    $.toast(data.msg)
+                    $.hideLoading()
+                    
+                    if(data.msg)
+                    {
+                        $.toast(data.msg)
+                    }
+                    else if(data.redirect)
+                    {
+                        window.location.href =data.redirect
+                    }
                     // console.dir(data)
                 },
                 error: function (e) {
+                    $.hideLoading()
                     $.toast("操作失败", "cancle")
                 }
             })
