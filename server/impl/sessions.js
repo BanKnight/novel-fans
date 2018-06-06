@@ -22,7 +22,7 @@ me.start = async function()
         let id = db_one._id
 
         data.sessions[id] = db_one.val
-        data.timeouts[id] = server.run_after((db_one.expired - now) * 1000,()=>
+        data.timeouts[id] = server.run_after(db_one.expired - now,()=>
         {
             delete data.sessions[id]
             delete data.timeouts[id]
@@ -71,7 +71,7 @@ me.set = async function(id,val,timeout)
 
     })
 
-    md_db.upsert("sessions",{_id:id},{val : val,expired : Date.now() + timeout / 1000})
+    md_db.upsert("sessions",{_id:id},{val : val,expired : Date.now() + timeout})
 }
 
 me.destroy = async function(id)
