@@ -130,15 +130,76 @@ me.update = async(book)=>
 
     md_logs.add(`${book.name} is updating`)
 
-    let sub = subs[book.site]
+    let web_site = subs[book.site]
 
-    let is_updated = await sub.update(book)
+    let url = book.url
+
+    if(url == null || book.site != web_site.name)
+    {
+        url = await web_site.search_link(book.name)
+
+        book.url = url
+    }
+
+    web_site.logs.add(`[${web_site.name}][${book.name}] get url:${url}`)
+
+    let that_book = await web_site.search_basic(url)
+    if(that_book == null)
+    {
+        md_locks.unlock(book.name,false)
+
+        return false
+    }
+
+    await web_site.search_catalog(that_book)
+
+    let search_index = book.chapters.length
+
+    for(let i = book.chapters.length - 1;i >= 0;--i)
+    {
+        let chapter = book.chapters[i]
+        if(chapter.content == null)
+        {
+            search_index = i
+        }
+        else
+        {
+            break
+        }
+    }
+
+    if(search_index == that_book.chapters.length)
+    {
+        web_site.logs.add(`[${web_site.name}][${book.name}] no need to update`)
+
+        md_locks.unlock(book.name,false)
+
+        return false
+    }
+
+    for(let i = search_index,len = that_book.chapters.length;i < len;++i)
+    {
+        let new_chapter = that_book.chapters[i]
+        let old_chapter = book.chapters[i]
+        if(old_chapter)
+        {
+            book.chapters[i] = new_chapter
+        }
+        else
+        {
+            book.chapters.push(new_chapter)
+        }
+    }
+
+    await web_site.search_chapters(book,search_index,book.chapters.length - 1)
+
+    web_site.logs.add(`[${web_site.name}][${book.name}] check update done,${search_index} => ${book.chapters.length}`)
 
     md_logs.add(`update ${book.name} is done`)
 
     md_locks.unlock(book.name,false)
 
-    return is_updated
+    return true
 }
 
 me.try_add_book = async(book_name)=>
@@ -158,7 +219,7 @@ me.try_add_book = async(book_name)=>
     {
         md_locks.unlock(book_name,false)        //让那些等待锁的 都返回false
 
-        console.log("no such book 1")
+        md_logs.add(`no such book:${book_name}`)
 
         return false
     }
@@ -176,7 +237,7 @@ me.try_add_book = async(book_name)=>
         md_locks.unlock(book_name,false)        //让那些等待锁的 都返回false
     })
 
-    console.log(`has this book ${book_name}`)
+    // console.log(`has this book ${book_name}`)
 
     return the_best_book
 }

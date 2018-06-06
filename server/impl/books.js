@@ -88,12 +88,15 @@ me.check_update = async()=>
     {
         let book = data[name]
 
-        let is_updated = await md_tasks.update(book)
-
-        if(is_updated == true)
+        setImmediate(async()=>
         {
-            me.update(book)
-        }
+            let is_updated = await md_tasks.update(book)
+
+            if(is_updated == true)
+            {
+                me.update(book)
+            }
+        })
     }
 }
 

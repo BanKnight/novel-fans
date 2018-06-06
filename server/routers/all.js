@@ -224,23 +224,23 @@ routers.get("/search/:keyword",async(ctx,next)=>
         book = await md_tasks.try_add_book(book_name)
     })
 
-    console.log(`time 1:${Date.now()}`)
+    // console.log(`time 1:${Date.now()}`)
 
     for(let i = 0;i < 300;++i)
     {
         await server.sleep(10)
         if(book != null)
         {
-            console.log(`break because of time,${i}`)
+            // console.log(`break because of time,${i}`)
             break
         }
     }
 
-    console.log(`time 2:${Date.now()},${typeof(book)},${book}`)
+    // console.log(`time 2:${Date.now()},${typeof(book)},${book}`)
 
     if(!book)
     {
-        console.log("no such book 2")
+        // console.log("no such book 2")
         ctx.body = {is_ok : true ,msg : "查无此书"}    
         return
     }
