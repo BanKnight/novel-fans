@@ -10,6 +10,10 @@ me.start = async function()
 {
     console.log("start to load sessions")
 
+    let now = Date.now()
+
+    md_db.remove_many("sessions",{expired : {$lte:now}})
+
     const sessions = await md_db.load("sessions")
 
     for(var i = 0,len = sessions.length;i < len;++i)
@@ -32,14 +36,27 @@ me.get = async function(id)
 
 me.set = async function(id,val,timeout)
 {
+    if (id in data.timeouts) clearTimeout(data.timeouts[id]);
+
     data.sessions[id] = val
+    data.timeouts[id] = setTimeout(()=>
+    {
+        delete data.sessions[id]
+        delete data.timeouts[id]
+
+        md_db.remove("sessions",{_id:id})
+
+    },timeout)
 
     md_db.upsert("sessions",{_id:id},{val : val,expired : Date.now() + timeout / 1000})
 }
 
 me.destroy = async function(id)
 {
+    if (id in data.timeouts) clearTimeout(data.timeouts[id]);
+
     delete data.sessions[id]
+    delete data.timeouts[sid];
 
     md_db.remove("sessions",{_id:id})
 }
