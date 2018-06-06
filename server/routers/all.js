@@ -1,4 +1,5 @@
 const helmet = require('koa-helmet')
+const compress = require('koa-compress')
 
 const server = global.server
 const app = server.app
@@ -8,7 +9,16 @@ const md_books = server.get("books")
 const md_logs = server.get("logs")
 const md_tasks = server.get("tasks")
 
+const compresser = compress({
+    filter: function (content_type) {
+        return /text/i.test(content_type)
+    },
+    threshold: 100,
+    flush: require('zlib').Z_SYNC_FLUSH
+})
+
 routers.use(helmet.noCache())           //浏览器不要缓存
+routers.use(compresser)
 
 routers.get("/",async(ctx,next)=>
 {

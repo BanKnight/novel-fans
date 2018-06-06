@@ -2,7 +2,6 @@ const helmet = require('koa-helmet')
 const limit = require('koa-limit')
 const convert = require('koa-convert')
 var bodyParser = require('koa-bodyparser')
-const compress = require('koa-compress')
 
 const server = global.server
 const app = server.app
@@ -38,15 +37,5 @@ routers.use(helmet.hidePoweredBy())     //      删除了 header 中的 X-Powere
 routers.use(helmet.ieNoOpen())
 
 routers.use(bodyParser())
-
-const compresser = compress({
-    filter: function (content_type) {
-        return /text/i.test(content_type)
-    },
-    threshold: 100,
-    flush: require('zlib').Z_SYNC_FLUSH
-})
-
-routers.use(compresser)
 
 
