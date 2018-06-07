@@ -1,7 +1,6 @@
 const helmet = require('koa-helmet')
 const compress = require('koa-compress')
 const crypto = require('crypto');
-const md5 = crypto.createHash('md5')
 const assert = require("assert")
 
 const server = global.server
@@ -404,12 +403,13 @@ routers.post("/login",async(ctx,next)=>
     assert(mail.length > 0)
     assert(pass.length > 0)
 
+    const md5 = crypto.createHash('md5')
     let trans_pass = md5.update(pass).digest('hex');
 
     let user = md_users.get_by_mail(mail)
     if(user == null)
     {
-        user = md_users.new(mail,trans_pass)
+        user = await md_users.new(mail,trans_pass)
     }
     else
     {

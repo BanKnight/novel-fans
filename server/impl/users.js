@@ -17,6 +17,7 @@ me.start = async function()
             id : db_one._id,
             mail:db_one.mail,
             pass:db_one.pass,
+            regist : db_one.regist,
             reading : db_one.reading || {}
         }
 
@@ -49,30 +50,32 @@ me.get_by_mail = function(mail)
     return data.mail_users[mail]
 }
 
-me.new = function(mail,pass)
+me.new = async function(mail,pass)
 {
     let user = {
         id : ++data.id_helper,
         mail : mail,
         pass : pass,
+        regist : Date.now(),
         reading : {},
     }
 
     data.pid_users[user.id] = user
     data.mail_users[user.mail] = user
 
-    md_db.upsert("users",{_id : user.id},{
+    await md_db.upsert("users",{_id : user.id},{
         mail : mail,
         pass : pass,
+        regist : user.regist,
         reading : {},
     })
 
     return user
 }
 
-me.update = function(user)
+me.update = async function(user)
 {
-    md_db.upsert("users",{_id : user.id},{
+    await md_db.upsert("users",{_id : user.id},{
         reading : user.reading,
     })
 
