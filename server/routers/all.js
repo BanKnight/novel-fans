@@ -1,5 +1,8 @@
 const helmet = require('koa-helmet')
 const compress = require('koa-compress')
+const crypto = require('crypto');
+const md5 = crypto.createHash('md5')
+const assert = require("assert")
 
 const server = global.server
 const app = server.app
@@ -8,6 +11,7 @@ const routers = server.routers
 const md_books = server.get("books")
 const md_logs = server.get("logs")
 const md_tasks = server.get("tasks")
+const md_users = server.get("users")
 
 const compresser = compress({
     filter: function (content_type) {
@@ -44,37 +48,30 @@ routers.get("/",async(ctx,next)=>
 routers.get("/books",async(ctx,next)=>
 {
     let info = {}
+    let session = ctx.session
+    let reading = session.reading
 
-    if(ctx.user)
+    info.books = {}
+
+    for(let book_name in reading)
     {
-        info.books = md_books.get_all()
-    }
-    else
-    {
-        let session = ctx.session
-        let reading = session.reading
+        let read = reading[book_name]
+        let book = md_books.get(book_name)
 
-        info.books = {}
+        read.time = read.time || 0
 
-        for(let book_name in reading)
+        if(book)
         {
-            let read = reading[book_name]
-            let book = md_books.get(book_name)
+            let chapter = book.chapters[read.chapter]
 
-            read.time = read.time || 0
-
-            if(book)
-            {
-                let chapter = book.chapters[read.chapter]
-
-                info.books[book_name] = {
-                    book : book,
-                    chapter : chapter,
-                    updated : (book.last > read.time)
-                }
+            info.books[book_name] = {
+                book : book,
+                chapter : chapter,
+                updated : (book.last > read.time)
             }
         }
     }
+    
 
     ctx.render("books",info)
 })
@@ -168,6 +165,11 @@ routers.get("/chapter/:book_name/:chapter_index",async(ctx,next)=>
     read_info.time = Date.now()
 
     md_books.update_last_read(book)
+
+    if(ctx.user)
+    {
+        md_users.update(ctx.user)
+    }
 
     ctx.render("chapter",info)
 })
@@ -361,9 +363,95 @@ routers.get("/refetch/:book_name/:chapter_index",async(ctx,next)=>
     ctx.body = {is_ok : true,msg : chapter.content}
 })
 
+routers.get("/me",async(ctx,next)=>
+{
+    if(ctx.user == null)
+    {
+        ctx.redirect("/login")
+        return
+    }
+
+    ctx.render("me")
+})
+
 routers.get("/about",async(ctx,next)=>
 {
     ctx.render("about")
 })
+
+routers.get("/login",async(ctx,next)=>
+{
+    if(ctx.user)
+    {
+        ctx.redirect("/")
+        return
+    }
+
+    ctx.render("login")
+})
+
+routers.post("/login",async(ctx,next)=>
+{
+    if(ctx.user)
+    {
+        ctx.redirect("/books")
+        return
+    }
+
+    let mail = ctx.request.body.mail
+    let pass = ctx.request.body.password
+
+    assert(mail.length > 0)
+    assert(pass.length > 0)
+
+    let trans_pass = md5.update(pass).digest('hex');
+
+    let user = md_users.get_by_mail(mail)
+    if(user == null)
+    {
+        user = md_users.new(mail,trans_pass)
+    }
+    else
+    {
+        if(user.pass != trans_pass)
+        {
+            ctx.body = {is_ok : false,msg : "密码错误"}
+            return
+        }
+    }
+
+    ctx.session.user_id = user.id
+
+    //合并一次书架
+    let should_save = false
+    for(let book_name in ctx.session.reading)
+    {
+        let read_info = ctx.session.reading[book_name]
+        let exist = user.reading[book_name]
+
+        should_save = true
+
+        if(exist == null)
+        {
+            exist = {chapter : read_info.chapter,time : read_info.time}
+            user.reading[book_name] = exist
+        }
+        else
+        {
+            exist.chapter = Math.max(exist.chapter,read_indo.chapter)
+            exist.time = Math.max(exist.time,read_indo.time)
+        }
+    }
+
+    if(should_save)
+    {
+        console.log("合并书架")
+        console.dir(user)
+        md_users.update(user)
+    }
+
+    ctx.body = {is_ok : true,redirect : "/"}
+})
+
 
 

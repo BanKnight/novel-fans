@@ -33,7 +33,7 @@
                     $(`#${book_name}`).remove()
                 },
                 error: function (e) {
-                    $.toast("操作失败", "cancle")
+                    $.toast("操作失败", "cancel")
                 }
             })
           $.toast("删除成功!");

@@ -60,7 +60,7 @@
                 },
                 error: function (e) {
                     $.hideLoading()
-                    $.toast("操作失败", "cancle")
+                    $.toast("操作失败", "cancel")
                 }
             })
 

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>{{block 'meta_title'}}{{title || web_name}}{{/block}}</title>
+
+    <meta name="description" content="{{block 'meta_description'}} {{meta_description || web_description}} {{/block}}">
+
+
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+
+    <!-- <link rel="stylesheet" href="https:///cdn.bootcss.com/normalize/8.0.0/normalize.min.css">
+    <link rel="stylesheet" href="https:///cdn.bootcss.com/pure/1.0.0/pure-min.css">
+    <link rel="stylesheet" href="https:///cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css"> -->
+
+    <!-- <link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.2/style/weui.min.css"> -->
+    <link rel="stylesheet" href="/public/weuix.min.css">
+    <link rel="stylesheet" href="/public/style.css">
+
+    <script src="https:///cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+    <script src="/public/zepto.min.js"></script> {{block 'page_head'}} {{/block}}
+
+</head>
+
+<body ontouchstart="" class="bg_gray">
+
+
+        <div class="weui-custom-pop weui-dialog-visible">
+            <div class="weui-custom-hd">登陆</div>
+            <div class="weui-custom-bd">
+                <input type="mail" class="weui_input" id="mail" placeholder="邮件">
+            </div>
+            <div class="weui-custom-bd">
+                <input type="password" class="weui_input" id="pass" placeholder="密码">
+            </div>
+            <div class="weui-custom-ft">
+                <a href="javascript:login();">确定</a>
+            </div>
+        </div>
+
+
+    <script>
+
+        var myreg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+
+
+        function showmark(){
+        $('.weui_mask').addClass('weui_mask_visible');
+                $('.weui-custom-pop').addClass('weui-dialog-visible');
+        }
+        function hidemark(){
+            $('.weui_mask').removeClass('weui_mask_visible');
+                $('.weui-custom-pop').removeClass('weui-dialog-visible');
+        }
+
+
+        function login() {
+            let mail_ele = $("#mail")
+            let pass_ele = $("#pass")
+
+            let mail = mail_ele.val().trim()
+            let pass = pass_ele.val().trim()
+
+            if (!myreg.test(mail))
+             {
+                $.toptips("邮件格式错误", "warning")
+
+                return
+            }
+            if (pass.length == 0) {
+                $.toptips("密码不能为空", "warning")
+                return
+            }
+
+            $.post({
+                url : "/login",
+                data : {mail : mail,password : pass},
+                success : (data)=>
+                {
+                    if(data.msg)
+                    {
+                        $.toptips(data.msg,"info")
+                    }
+                    else if(data.redirect)
+                    {
+                        window.location.href = data.redirect
+                    }
+                },
+                error:(e)=>
+                {
+                    $.toptips(data.msg)
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>

@@ -120,12 +120,12 @@
                     }
                     else
                     {
-                        $.toast(data.msg,"cancle")  
+                        $.toast(data.msg,"cancel")  
                     }
                 },
                 error: function (e) {
                     $.hideLoading()
-                    $.toast("网络出现状况", "cancle")
+                    $.toast("网络出现状况", "cancel")
                 }            
             })
         }

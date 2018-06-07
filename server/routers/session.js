@@ -45,8 +45,15 @@ function find_user(ctx,next)
     }
 
     let user = md_users.get(user_id)
+    if(user == null)
+    {
+        ctx.session.user_id = null
+        return next()
+    }
 
     ctx.user = user
+
+    ctx.session.reading = user.reading
 
     return next()
 }
