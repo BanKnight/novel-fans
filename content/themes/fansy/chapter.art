@@ -7,7 +7,7 @@
     </div>
     <h1 class="weui-header-title f-black">{{book.name}}</h1>
     <div class="weui-header-right">
-        <a class="icon icon-108 f-black">换源</a>
+        <a class="icon icon-108 f-black" href="javascript:refetch('{{book.name}}',{{chapter.index}})">重拉</a>
     </div>
 </div>
 {{/block}} 
@@ -16,7 +16,7 @@
 
 <div class="weui-weixin-page">
     <h2 class="weui-weixin-title">{{chapter.name}}</h2>
-    <div class="weui-weixin-content" id="chapter">
+    <div class="weui-weixin-content" id="content">
         {{@chapter.content}}
     </div>
     <div style="height:60px">
@@ -104,6 +104,31 @@
         //         that_bar_body.scrollTop(that_bar_body.scrollTop() + page_height)
         //     }
         // })
+
+        function refetch(book_name,chapter_index)
+        {
+            $.showLoading()
+            $.get({
+                url : `/refetch/${book_name}/${chapter_index}`,
+                success:function(data)
+                {
+                    $.hideLoading()
+                    if(data.is_ok)
+                    {
+                        $("#content").html(data.msg)
+                        $.toast("获取成功")
+                    }
+                    else
+                    {
+                        $.toast(data.msg,"cancle")  
+                    }
+                },
+                error: function (e) {
+                    $.hideLoading()
+                    $.toast("网络出现状况", "cancle")
+                }            
+            })
+        }
     
     </script>
 {{/block}}

@@ -118,90 +118,6 @@ me.search_site = async(site,book_name)=>
     return book
 }
 
-me.update = async(book)=>
-{
-    let is_lock = await md_locks.lock(book.name)
-
-    if(is_lock !== true)
-    {
-        md_logs.add(`${book.name} is already added to the updating task`)
-        return is_lock
-    }
-
-    md_logs.add(`${book.name} is updating`)
-
-    let web_site = subs[book.site]
-
-    let url = book.url
-
-    if(url == null || book.site != web_site.name)
-    {
-        url = await web_site.search_link(book.name)
-
-        book.url = url
-    }
-
-    web_site.logs.add(`[${web_site.name}][${book.name}] get url:${url}`)
-
-    let that_book = await web_site.search_basic(url)
-    if(that_book == null)
-    {
-        md_locks.unlock(book.name,false)
-
-        return false
-    }
-
-    await web_site.search_catalog(that_book)
-
-    let search_index = book.chapters.length
-
-    for(let i = book.chapters.length - 1;i >= 0;--i)
-    {
-        let chapter = book.chapters[i]
-        if(chapter.content == null)
-        {
-            search_index = i
-        }
-        else
-        {
-            break
-        }
-    }
-
-    if(search_index == that_book.chapters.length)
-    {
-        web_site.logs.add(`[${web_site.name}][${book.name}] no need to update`)
-
-        md_locks.unlock(book.name,false)
-
-        return false
-    }
-
-    for(let i = search_index,len = that_book.chapters.length;i < len;++i)
-    {
-        let new_chapter = that_book.chapters[i]
-        let old_chapter = book.chapters[i]
-        if(old_chapter)
-        {
-            book.chapters[i] = new_chapter
-        }
-        else
-        {
-            book.chapters.push(new_chapter)
-        }
-    }
-
-    await web_site.search_chapters(book,search_index,book.chapters.length - 1)
-
-    web_site.logs.add(`[${web_site.name}][${book.name}] check update done,${search_index} => ${book.chapters.length}`)
-
-    md_logs.add(`update ${book.name} is done`)
-
-    md_locks.unlock(book.name,false)
-
-    return true
-}
-
 me.try_add_book = async(book_name)=>
 {
     let is_lock = await md_locks.lock(book_name)
@@ -289,4 +205,152 @@ me.search_the_best = async(book_name)=>
     }
 
     return the_best_book
+}
+
+me.update = async(book)=>
+{
+    let is_lock = await md_locks.lock(book.name)
+
+    if(is_lock !== true)
+    {
+        md_logs.add(`${book.name} is already added to the updating task`)
+        return is_lock
+    }
+
+    md_logs.add(`${book.name} is updating`)
+
+    let web_site = subs[book.site]
+
+    let url = book.url
+
+    if(url == null || book.site != web_site.name)
+    {
+        url = await web_site.search_link(book.name)
+
+        book.url = url
+    }
+
+    web_site.logs.add(`[${web_site.name}][${book.name}] get url:${url}`)
+
+    let that_book = await web_site.search_basic(url)
+    if(that_book == null)
+    {
+        md_locks.unlock(book.name,false)
+
+        return false
+    }
+
+    await web_site.search_catalog(that_book)
+
+    let search_index = book.chapters.length
+
+    //Todo binary search
+    for(let i = book.chapters.length - 1;i >= 0;--i)
+    {
+        let chapter = book.chapters[i]
+        if(chapter.content == null)
+        {
+            search_index = i
+        }
+        else
+        {
+            break
+        }
+    }
+
+    if(search_index == that_book.chapters.length)
+    {
+        web_site.logs.add(`[${web_site.name}][${book.name}] no need to update`)
+
+        md_locks.unlock(book.name,false)
+
+        return false
+    }
+
+    for(let i = search_index,len = that_book.chapters.length;i < len;++i)
+    {
+        let new_chapter = that_book.chapters[i]
+        let old_chapter = book.chapters[i]
+        if(old_chapter)
+        {
+            book.chapters[i] = new_chapter
+        }
+        else
+        {
+            book.chapters.push(new_chapter)
+        }
+    }
+
+    await web_site.search_chapters(book,search_index,book.chapters.length - 1)
+
+    web_site.logs.add(`[${web_site.name}][${book.name}] check update done,${search_index} => ${book.chapters.length}`)
+
+    md_logs.add(`update ${book.name} is done`)
+
+    md_locks.unlock(book.name,false)
+
+    return true
+}
+
+me.update_chapter = async(book,chapter_index)=>
+{
+    let lock_name = `/${book.name}/${chapter_index}`
+    let is_lock = await md_locks.lock(lock_name)
+
+    if(is_lock !== true)
+    {
+        return is_lock
+    }
+
+    let chapter = book.chapters[chapter_index]
+    if(chapter == null)
+    {
+        md_locks.unlock(lock_name,false)
+        console.log("没有这个章节")
+        return false
+    }
+
+    let web_site = subs[book.site]
+
+    if(chapter.url == null)
+    {
+        let book_url = book.url
+
+        if(book_url == null)
+        {
+            book_url = await web_site.search_link(book.name)
+            book.url = book_url
+        }
+
+        let that_book = await web_site.search_basic(book_url)
+        if(that_book == null)
+        {
+            md_locks.unlock(lock_name,false)
+            return false
+        }
+
+        await web_site.search_catalog(that_book)
+
+        let that_chapter = that_book.chapters[chapter_index]
+        if(that_chapter == null)
+        {
+            md_locks.unlock(lock_name,false)
+            return false
+        }
+        if(chapter.name != that_chapter.name)
+        {
+            md_locks.unlock(lock_name,false)
+            return false
+        }
+
+        chapter.url = that_chapter.url
+
+    }
+    await web_site.search_chapters(book,chapter_index,chapter_index)
+
+    web_site.logs.add(`[${web_site.name}][${book.name}] update chapter done,${chapter_index}`)
+
+    md_locks.unlock(lock_name,false)
+
+    return true
 }

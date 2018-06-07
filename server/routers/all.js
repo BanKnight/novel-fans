@@ -309,4 +309,36 @@ routers.get("/me",async(ctx,next)=>
     ctx.render("me")
 })
 
+routers.get("/refetch/:book_name/:chapter_index",async(ctx,next)=>
+{
+    let book_name = ctx.params.book_name
+    let chapter_index = parseInt(ctx.params.chapter_index)
+
+    let book = md_books.get(book_name)
+    if(book == null)
+    {
+        ctx.body = {is_ok : false,msg : "查无此书"}
+        return
+    }
+
+    let chapter = book.chapters[chapter_index]
+
+    if(chapter == null)
+    {
+        ctx.body = {is_ok : false,msg : "查无此章节"}
+        return 
+    }
+
+    let is_updated = await md_tasks.update_chapter(book,chapter_index)
+    if(is_updated == false)
+    {
+        ctx.body = {is_ok : false,msg : "更新失败"}
+        return
+    }
+    
+    md_books.update_chapter(book,chapter_index)
+
+    ctx.body = {is_ok : true,msg : chapter.content}
+})
+
 
