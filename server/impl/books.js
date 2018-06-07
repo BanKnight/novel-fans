@@ -22,8 +22,8 @@ me.start = async () => {
             site: db_one_data.site,
             url: db_one_data.url,
             create: db_one_data.create || Date.now(),
-            last: db_one_data.last || 0,
-
+            last: db_one_data.last || Date.now(),
+            last_read : db_one_data.last || 0,
             chapters: [],
         }
 
@@ -157,9 +157,16 @@ me.update = (book) => {
 
     book.last = Date.now()      //上次更新的时间
 
-    md_db.upsert("basic", { _id: book.name }, { last: book.last })
+    md_db.upsert("basic", { _id: book.name }, { last: book.last})
 
     md_logs.add(`${book.name} update:${update_count} chapters`)
+}
+
+me.update_last_read = (book)=>
+{
+    book.last_read = Date.now()
+
+    md_db.upsert("basic", { _id: book.name }, { last_read: book.last_read})
 }
 
 me.update_chapter = function (book, chapter_index)

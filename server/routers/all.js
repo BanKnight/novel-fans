@@ -167,6 +167,8 @@ routers.get("/chapter/:book_name/:chapter_index",async(ctx,next)=>
     read_info.chapter = index
     read_info.time = Date.now()
 
+    md_books.update_last_read(book)
+
     ctx.render("chapter",info)
 })
 
