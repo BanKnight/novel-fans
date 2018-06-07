@@ -1,0 +1,42 @@
+{{extend './layouts/main.art'}} {{block 'bar_head'}} {{include './partials/top_title.art' '我'}} {{/block}} {{block 'bar_body'}}
+    <div class="timeline">
+        <ul>
+            <li class="timeline-item">
+                <div class="timeline-item-head-first">
+                    <i class="weui_icon weui_icon_success_no_circle timeline-item-checked"></i>
+                </div>
+                <div class="timeline-item-tail"></div>
+                <div class="timeline-item-content">
+                    <h4 class="recent">novel-fans:是一个业余之作，用于自己和朋友看小说方便而做的，不做商业用途</h4>
+                    <p class="recent">未来</p>
+                </div>
+            </li>
+            <li class="timeline-item">
+                <div class="timeline-item-head">
+                    <i class="weui_icon weui_icon_success_no_circle timeline-item-checked hide"></i>
+                </div>
+                <div class="timeline-item-tail"></div>
+                <div class="timeline-item-content">
+                    <h4>欢迎提issue <a href="https://github.com/BanKnight/novel-fans" target="_blank">github</a></h4>
+                    <p>2018-06-07</p>
+                </div>
+            </li>
+            <li class="timeline-item">
+                <div class="timeline-item-head">
+                    <i class="weui_icon weui_icon_success_no_circle timeline-item-checked hide"></i>
+                </div>
+                <div class="timeline-item-tail"></div>
+                <div class="timeline-item-content">
+                    <h4>网站基本完善，基础功能都已完成，目前只有1个源，欢迎增加新的源。而多源之间的内容合并，目前尚无，所以一个网站目前只支持一个源</h4>
+                    <p>2018-06-07</p>
+                </div>
+            </li>
+
+        </ul>
+    </div>
+
+{{/block}} {{block 'page_footer'}}
+
+<script>
+    turn_bar_on("about")
+</script> {{/block}}

@@ -304,11 +304,6 @@ routers.post("/debug",async(ctx,next)=>
     }
 })
 
-routers.get("/me",async(ctx,next)=>
-{
-    ctx.render("me")
-})
-
 routers.get("/refetch/:book_name/:chapter_index",async(ctx,next)=>
 {
     let book_name = ctx.params.book_name
@@ -339,6 +334,11 @@ routers.get("/refetch/:book_name/:chapter_index",async(ctx,next)=>
     md_books.update_chapter(book,chapter_index)
 
     ctx.body = {is_ok : true,msg : chapter.content}
+})
+
+routers.get("/about",async(ctx,next)=>
+{
+    ctx.render("about")
 })
 
 

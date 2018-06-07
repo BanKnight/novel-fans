@@ -26,5 +26,6 @@ server.start = async function()
 server.init_data = async function()
 {
     server.data.web_name = config.web_name
+    server.data.web_description = config.web_description || "为朋友而生的小说网站"
 }
 

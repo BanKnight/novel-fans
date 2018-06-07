@@ -8,6 +8,9 @@
 
     <title>{{block 'meta_title'}}{{title || web_name}}{{/block}}</title>
 
+    <meta name="description" content="{{block 'meta_description'}} {{meta_description || web_description}} {{/block}}">
+
+
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
 
     <!-- <link rel="stylesheet" href="https:///cdn.bootcss.com/normalize/8.0.0/normalize.min.css">
@@ -114,11 +117,11 @@
                     </div>
                     <p class="weui_tabbar_label">日志</p>
                 </a>
-                <a href="/me" class="weui_tabbar_item" id="me">
+                <a href="/about" class="weui_tabbar_item" id="me">
                     <div class="weui_tabbar_icon">
                         <img src="/public/img/icon_nav_cell.png" alt="">
                     </div>
-                    <p class="weui_tabbar_label">我</p>
+                    <p class="weui_tabbar_label">关于</p>
                 </a>
     
                 <script>
