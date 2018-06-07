@@ -397,7 +397,7 @@ routers.post("/login",async(ctx,next)=>
         return
     }
 
-    let mail = ctx.request.body.mail
+    let mail = ctx.request.body.mail.toLowerCase()
     let pass = ctx.request.body.password
 
     assert(mail.length > 0)
