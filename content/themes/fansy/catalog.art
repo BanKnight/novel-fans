@@ -5,7 +5,10 @@
 <div class="weui_cells_title">{{book.name}}-目录</div>
 
 <div class="weui_cells weui_cells_access">
-    {{each book.chapters chapter}} {{include './partials/catalog_card.art' chapter}} {{/each}}
+
+    <% for(var i = book.chapters.length - 1; i >= 0; --i){ %>
+        <% include('./partials/catalog_card.art', book.chapters[i]) %>
+    <% } %>
 </div>
 
 {{/block}} 
