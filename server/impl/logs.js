@@ -42,9 +42,10 @@ me.add = (content)=>
 
     if(data.items.length > config.logs.max)
     {
+
         data.items.splice(0,data.items.length - config.logs.max + 50)   //多删除一点
 
-        let last_id = data.items[data.items.length - 1]
+        let last_id = data.items[data.items.length - 1].id
 
         md_db.remove_many("logs",{_id : {$lt : last_id}})
     }

@@ -188,11 +188,34 @@ routers.get("/intro/:book_name",async(ctx,next)=>
 
 routers.get("/logs",async(ctx,next)=>
 {
-    let info = {
-        logs : md_logs.get_all()
+    ctx.render("logs")
+})
+
+routers.get("/logs/:last_id",async(ctx,next)=>
+{
+    let max_count = 0
+    let last_id = parseInt(ctx.params.last_id)
+
+    console.log(`fetch logs:${last_id}`)
+
+    let logs = md_logs.get_all()
+    let info = []
+
+    let the_last_index = logs.length - 1
+    let start_index = the_last_index
+    if(last_id > 0)
+    {
+        start_index = the_last_index - (logs[the_last_index].id - last_id) - 1
     }
 
-    ctx.render("logs",info)
+    for(let stop_index = start_index - 6;start_index >= stop_index && start_index >= 0;start_index--)
+    {
+        info.push(logs[start_index])
+    }
+
+    // console.dir(info)
+
+    ctx.body = {logs : info}
 })
 
 routers.get("/search",async(ctx,next)=>

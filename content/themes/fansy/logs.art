@@ -1,29 +1,80 @@
 {{extend './layouts/main.art'}}
 
-{{block 'bar_head'}}
+{{block 'page_head'}}
+<script src="https://cdn.bootcss.com/moment.js/2.22.1/moment.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.22.1/locale/zh-cn.js"></script>
+{{/block}}
 
-    {{include './partials/top_title.art' '日志'}}
+{{block 'bar_head'}} 
 
+{{include './partials/top_title.art' '日志'}} 
 
 {{/block}} 
 
 {{block 'bar_body'}}
-    <div class="weui_panel_bd">
-        <div class="weui_cells">
-            {{each logs log}}
-                {{include './partials/log_card.art' log}}
-            {{/each}}
-        </div>
- 
+
+<div class="weui_panel weui_panel_access">
+    <div class="weui_panel_bd" id="logs">
+        
     </div>
+    <a href="javascript:fetch_logs_by_page()" class="weui_panel_ft">查看更前信息</a>
+</div>
 
-{{/block}}
+{{/block}} {{block 'page_footer'}}
 
-{{block 'page_footer'}}
 
-    <script>
-        turn_bar_on("logs")
-        scroll_bar_body_bottom()
-    </script>
+<script>
+    turn_bar_on("logs")
+    scroll_bar_body_bottom()
+
+    let last_id = -1
+
+    function fetch_logs_by_page()
+    {
+        $.showLoading()
+
+        let logs_ele = $("#logs")
+
+        $.get({
+            url : `/logs/${last_id}`,
+            success:(data)=>
+            {
+                $.hideLoading()
+
+                for(let i = 0;i < data.logs.length;++i)
+                {
+                    let log = data.logs[i]
+
+                    log.format = moment(log.update).format('YYYY-MM-DD HH:mm:ss')
+
+                    let new_html = `
+                        <div class="weui_media_box weui_media_text">
+                            <h4 class="weui_media_title">${log.format}</h4>
+                            <p class="weui_media_desc">${log.content}</p>
+                        </div>
+                    `
+                    logs_ele.append(new_html)
+                }
+    
+                if(data.logs.length == 0)
+                {
+                    $.toast("已没有更前的日志")
+                }
+                else
+                {
+                    last_id = data.logs[data.logs.length - 1].id
+                    scroll_bar_body_bottom()
+                }
+            },
+            error:(e)=>
+            {
+                $.hideLoading()
+            }
+        }
+        )
+    }
+
+    fetch_logs_by_page()
+</script>
 
 {{/block}}
