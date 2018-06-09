@@ -61,11 +61,12 @@ routers.get("/books",async(ctx,next)=>
 
         if(book)
         {
-            let chapter = book.chapters[read.chapter]
+            let chapter = book.chapters[book.chapters.length - 1]
 
             info.books[book_name] = {
                 book : book,
                 chapter : chapter,
+                index : read.chapter,
                 updated : (book.last > read.time)
             }
         }

@@ -1,4 +1,4 @@
-{{set fix_show_index = chapter.index + 1}}
+{{set fix_show_index = index + 1}}
 <div class="weui_media_box weui_media_text" id="{{book.name}}">
     <h4 class="weui_media_title">{{book.name}}
         {{if updated}}
