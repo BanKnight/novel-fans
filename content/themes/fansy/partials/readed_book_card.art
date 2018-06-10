@@ -6,8 +6,8 @@
         {{/if}}
         <span class="weui-badge weui-badge-dot" style="margin-left: 5px;" onclick="del_book('{{book.name}}')">删除</span>
     </h4>
-    <p class="weui_media_desc" onclick="javascript:location.href='/chapter/{{book.name}}/{{chapter.index}}' ">最新章节:{{chapter.name}}</p>
-    <ul class="weui_media_info" onclick="javascript:location.href='/chapter/{{book.name}}/{{chapter.index}}' ">
+    <p class="weui_media_desc" onclick="javascript:location.href='/chapter/{{book.name}}/{{index}}' ">最新章节:{{chapter.name}}</p>
+    <ul class="weui_media_info" onclick="javascript:location.href='/chapter/{{book.name}}/{{index}}' ">
         <li class="weui_media_info_meta">{{fix_show_index}}/{{book.chapters.length}}</li>
         <li class="weui_media_info_meta weui_media_info_meta_extra">{{book.last | from_now}}</li>
     </ul>
