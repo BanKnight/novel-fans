@@ -171,7 +171,7 @@ me.update = (book) =>
 
     book.last = Date.now()      //上次更新的时间
 
-    md_db.upsert("basic", { _id: book.name }, { last: book.last})
+    md_db.upsert("basic", { _id: book.name }, { last: book.last,url : book.url})
 
     md_logs.add(`${book.name} update:${update_count} chapters`)
 }
