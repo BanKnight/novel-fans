@@ -196,6 +196,19 @@ me.load_chapter = async(book,chapter)=>
     chapter.need_load_content = false
 
     md_logs.add(`${book.name} load chapter:${chapter.name}`)
+
+    if(chapter.timer)
+    {
+        return
+    }
+
+    //两天后卸掉正文，保持内存比较少
+    chapter.timer = server.run_after(2 * 24 * 3600 * 1000,()=>
+    {
+        chapter.timer = null
+        chapter.content = null
+        chapter.need_load_content = true
+    })
 }
 
 me.update_chapter = function (book, chapter)
