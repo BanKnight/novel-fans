@@ -122,9 +122,12 @@ web_site.search_catalog = async(book)=>
         book.chapters.push({
             book : book.name,
             name : html.html(),
+            site : web_site.name,
             index : book.chapters.length,
             update : Date.now(),
             url : `${web_site.url}${html.attr("href")}`,
+            need_save : true,
+            need_load_content : false,
         })
     });
 
@@ -152,9 +155,9 @@ web_site.search_chapters = async(book,start,stop)=>
 
         let $ = web_site.cheerio.load(html,{decodeEntities: false})
 
-        chapter.site = web_site.name
         chapter.content = $("#content").html()        //这里有加入书签的html代码
         chapter.need_save = true
+        chapter.need_load_content = false
 
         if(i % 50 == 0)
         {

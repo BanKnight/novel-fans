@@ -23,6 +23,7 @@
 + summary:简介
 + site:来源网站的名字
 + last:上次更新的时间
++ last_read:上次被人读过的时间
 
 ## chapter:记录书的章节内容
 
@@ -33,8 +34,9 @@ book + index:联合成为key
 + name:章节名称
 + content:正文的html
 + update:上次更新时间
++ url:正文的链接
 
-## logs:记录爬虫的日志,最多1000条
+## logs:记录爬虫的日志,最多100条
 + _id:生成的自动id
 + content:内容
 + update:记录的时间

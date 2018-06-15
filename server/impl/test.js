@@ -51,7 +51,7 @@ me.test_task = async() => {
 
     if(book == null)
     {
-        book = await md_tasks.search("修真聊天群")
+        book = await md_tasks.try_add_book("修真聊天群")
         if(book)
         {
             md_books.add(book)

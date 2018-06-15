@@ -1,5 +1,7 @@
 {{extend './layouts/main.art'}}
 
+{{block 'meta_title'}}{{web_name}} | {{book.name}} | {{chapter.name}} {{/block}}
+
 {{block 'bar_head'}}
 <div class="weui_btn_default weui-header ">
     <div class="weui-header-left">

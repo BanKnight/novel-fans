@@ -82,13 +82,6 @@ routers.get("/catalog/:book_name",async(ctx,next)=>
         book : md_books.get(ctx.params.book_name)
     }
 
-    console.log(`get a catalog:${ctx.params.book_name}`)
-
-    if(info.book)
-    {
-        console.log("successfull get a book")
-    }
-
     ctx.render("catalog",info)
 })
 
@@ -144,7 +137,21 @@ routers.get("/chapter/:book_name/:chapter_index",async(ctx,next)=>
         return
     }
 
-    console.log("read chapter")
+    if(chapter.need_load_content)       //
+    {
+        await md_books.load_chapter(book,chapter)
+    }
+
+    if(chapter.content == null)     //也许从来没有拉取过数据,这时候需要重新拉取
+    {
+        let is_updated = await md_tasks.update_chapter(book,chapter)
+        if(is_updated)
+        {
+            md_books.update_chapter(book,chapter)       //存入数据库
+        }
+            
+        md_books.update_chapter(book,chapter)
+    }
 
     let info = {
         book : book,
@@ -298,7 +305,7 @@ routers.post("/debug",async(ctx,next)=>
     let arg = params.arg
     let secret = params.secret
 
-    if(secret != 10086)
+    if(secret != server.secret)
     {
         return
     }
@@ -351,14 +358,16 @@ routers.get("/refetch/:book_name/:chapter_index",async(ctx,next)=>
         return 
     }
 
-    let is_updated = await md_tasks.update_chapter(book,chapter_index)
+    let is_updated = await md_tasks.update_chapter(book,chapter)
     if(is_updated == false)
     {
         ctx.body = {is_ok : false,msg : "更新失败"}
         return
     }
     
-    md_books.update_chapter(book,chapter_index)
+    chapter.need_load_content = false
+
+    md_books.update_chapter(book,chapter)
 
     ctx.body = {is_ok : true,msg : chapter.content}
 })

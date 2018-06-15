@@ -16,9 +16,11 @@ server.start = async function()
 
     server.init_data()
 
+    server.secret = rand(1000,10000)
+
     app.listen(config.port)
 
-    console.log(`listening at ${config.port}`)
+    console.log(`listening at ${config.port},secret is ${server.secret}`)
 
     return true
 }
