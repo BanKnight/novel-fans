@@ -82,7 +82,7 @@ me.try_add_book = async(book_name)=>
 
         md_logs.add(`no such book:${book_name}`)
 
-        return false
+        return null
     }
 
     //正文先不着急拉取

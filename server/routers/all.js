@@ -251,11 +251,13 @@ routers.get("/search/:keyword",async(ctx,next)=>
         return
     }
 
-    let book = null
+    let book = true
 
     setImmediate(async()=>
     {
-        book = await md_tasks.try_add_book(book_name)
+        //false : another searching
+        //null:no such book
+        book = await md_tasks.try_add_book(book_name)       
     })
 
     // console.log(`time 1:${Date.now()}`)
@@ -263,7 +265,7 @@ routers.get("/search/:keyword",async(ctx,next)=>
     for(let i = 0;i < 300;++i)
     {
         await server.sleep(10)
-        if(book != null)
+        if(book !== true)
         {
             // console.log(`break because of time,${i}`)
             break
@@ -272,10 +274,16 @@ routers.get("/search/:keyword",async(ctx,next)=>
 
     // console.log(`time 2:${Date.now()},${typeof(book)},${book}`)
 
-    if(!book)
+    if(book == null)
     {
         // console.log("no such book 2")
         ctx.body = {is_ok : true ,msg : "查无此书"}    
+        return
+    }
+
+    if(book === true)
+    {
+        ctx.body = {is_ok : true ,msg : "服务器繁忙，稍后再搜索"}    
         return
     }
 
