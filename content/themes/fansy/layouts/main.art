@@ -30,68 +30,69 @@
 
 <body ontouchstart="">
 
-    <div class="bg_gray" style="min-height:100%" id = "page">
+    <div class="bg_gray" style="min-height:100%" id="page">
 
-            <script>
-                    function turn_theme_to(theme_name)
-                    {
-                        let e = $("#page")
-                        theme_name = theme_name || "light" 
-            
-                        e.removeClass("inverted")
-            
-                        if(theme_name == "dark")
-                        {
-                            e.addClass("inverted")
-                        }
-            
-                        utils.set_storage("theme",theme_name)
-                    }
-            
-                    function switch_theme()
-                    {
-                        let e = $("#page")
-                        let curr_theme = utils.get_storage("theme")
-            
-                        if(curr_theme == null || curr_theme == "light")
-                        {
-                            curr_theme = "dark"
-                        }
-                        else
-                        {
-                            curr_theme = "light"
-                        }
-            
-                        turn_theme_to(curr_theme)
-                    }
-                
-                    utils.init()
-            
-                    turn_theme_to(utils.get_storage("theme"))
-            
-                </script>
+        <script>
+            function turn_theme_to(theme_name)
+            {
+                let e = $("#page")
+                theme_name = theme_name || "light"
+
+                e.removeClass("inverted")
+
+                if (theme_name == "dark")
+                {
+                    e.addClass("inverted")
+                }
+
+                utils.set_storage("theme", theme_name)
+            }
+
+            function switch_theme()
+            {
+                let e = $("#page")
+                let curr_theme = utils.get_storage("theme")
+
+                if (curr_theme == null || curr_theme == "light")
+                {
+                    curr_theme = "dark"
+                }
+                else
+                {
+                    curr_theme = "light"
+                }
+
+                turn_theme_to(curr_theme)
+            }
+
+            utils.init()
+
+            turn_theme_to(utils.get_storage("theme"))
+
+        </script>
 
         <div class="weui_tab tab-bottom">
-            {{block 'bar_head'}}
-            {{/block}}
-    
+            {{block 'bar_head'}} {{/block}}
+
             <div class="weui_tab_bd" id="bar_body">
                 {{block 'bar_body'}} this is main {{/block}}
             </div>
-    
+
             <script>
-    
-                    function scroll_bar_body_top(){
-                        let that_bar = $(`#bar_body`)
-                        that_bar.animate({scrollTop:"0px"},1000)
-                    }
-    
-                    function scroll_bar_body_bottom(){
-                        let that_bar = $(`#bar_body`)
-    
-                        that_bar.animate({scrollTop:that_bar[0].scrollHeight},1000)
-                    }
-    
+
+                function scroll_bar_body_top()
+                {
+                    let that_bar = $(`#bar_body`)
+                    that_bar.animate({ scrollTop: "0px" }, 1000)
+                }
+
+                function scroll_bar_body_bottom()
+                {
+                    let that_bar = $(`#bar_body`)
+
+                    that_bar.animate({ scrollTop: that_bar[0].scrollHeight }, 1000)
+                }
+
                     // that_bar.click((e)=>
                     // {
                     //     console.log(`${e.clientX} ${e.clientY} ${window.innerWidth}`)
@@ -111,13 +112,6 @@
                     </div>
                     <p class="weui_tabbar_label">书架</p>
                 </a>
-                <a href="/logs" class="weui_tabbar_item" id="logs">
-                    <div class="weui_tabbar_icon">
-                        <img src="/public/img/icon_nav_cell.png" alt="">
-                    </div>
-                    <p class="weui_tabbar_label">日志</p>
-                </a>
-                
                 <a href="/me" class="weui_tabbar_item" id="me">
                     <div class="weui_tabbar_icon">
                         <img src="/public/img/icon_nav_cell.png" alt="">
@@ -131,21 +125,23 @@
                     </div>
                     <p class="weui_tabbar_label">关于</p>
                 </a>
-    
+
                 <script>
-                    function turn_bar_on(id) {
+                    function turn_bar_on(id)
+                    {
                         let that_bar = $(`#${id}`)
                         let old_on_bar = $(".weui_tabbar_item.weui_bar_item_on")
-    
-                        if (old_on_bar) {
+
+                        if (old_on_bar)
+                        {
                             old_on_bar.removeClass("weui_bar_item_on")
                         }
-                        if (that_bar) {
+                        if (that_bar)
+                        {
                             that_bar.addClass("weui_bar_item_on")
                         }
                     }
-                </script>
-                {{/block}}
+                </script> {{/block}}
             </div>
         </div>
         {{block 'page_footer'}} {{/block}}

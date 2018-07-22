@@ -1,8 +1,5 @@
-{{extend './layouts/main.art'}}
-
-{{block 'meta_title'}}{{web_name}} | {{book.name}} | {{chapter.name}} {{/block}}
-
-{{block 'bar_head'}}
+{{extend './layouts/main.art'}} {{block 'meta_title'}}{{web_name}} | {{book.name}} | {{chapter.name}} {{/block}} {{block
+'bar_head'}}
 <div class="weui_btn_default weui-header ">
     <div class="weui-header-left">
         <a class="icon icon-109 f-black" href="javascript:history.back()"></a>
@@ -12,9 +9,7 @@
         <a class="icon icon-108 f-black" href="javascript:refetch('{{book.name}}',{{chapter.index}})">重拉</a>
     </div>
 </div>
-{{/block}} 
-
-{{block 'bar_body'}}
+{{/block}} {{block 'bar_body'}}
 
 <div class="weui-weixin-page">
     <h2 class="weui-weixin-title">{{chapter.name}}</h2>
@@ -26,75 +21,70 @@
     </div>
 </div>
 
-{{/block}} 
+{{/block}} {{block 'bar_footer'}} {{set older = index - 1}} {{set newer = 1 + index}} {{if older >= 0}}
+<a href="/chapter/{{book.name}}/{{older}}" class="weui_tabbar_item">
+    <div class="weui_tabbar_icon">
+        <img src="/public/img/icon_nav_cell.png" alt="">
+    </div>
+    <p class="weui_tabbar_label">上一章</p>
+</a>
+{{else}}
+<a href="javascript:;" class="weui_tabbar_item">
+    <div class="weui_tabbar_icon">
+        <img src="/public/img/icon_nav_cell.png" alt="">
+    </div>
+    <p class="weui_tabbar_label">上一章(无)</p>
+</a>
+{{/if}}
+<a href="/" class="weui_tabbar_item">
+    <div class="weui_tabbar_icon">
+        <img src="/public/img/icon_nav_cell.png" alt="">
+    </div>
+    <p class="weui_tabbar_label">书架</p>
+</a>
 
-{{block 'bar_footer'}}
+<a href="/catalog/{{book.name}}" class="weui_tabbar_item">
+    <div class="weui_tabbar_icon">
+        <img src="/public/img/icon_nav_article.png" alt="">
+    </div>
+    <p class="weui_tabbar_label">目录</p>
+</a>
 
-    {{set older = index - 1}}
-    {{set newer = 1 + index}}
+<a href="javascript:switch_theme();" class="weui_tabbar_item">
+    <div class="weui_tabbar_icon">
+        <img src="/public/img/icon_nav_button.png" alt="">
+    </div>
+    <p class="weui_tabbar_label">日/夜</p>
+</a>
 
-    {{if older >= 0}}
-    <a href="/chapter/{{book.name}}/{{older}}" class="weui_tabbar_item">
-        <div class="weui_tabbar_icon">
-            <img src="/public/img/icon_nav_cell.png" alt="">
-        </div>
-        <p class="weui_tabbar_label">上一章</p>
+{{if newer
+< book.chapters.length}} <a href="/chapter/{{book.name}}/{{newer}}" class="weui_tabbar_item">
+    <div class="weui_tabbar_icon">
+        <img src="/public/img/icon_nav_cell.png" alt="">
+    </div>
+    <p class="weui_tabbar_label">下一章</p>
     </a>
     {{else}}
-        <a href="javascript:;" class="weui_tabbar_item">
-            <div class="weui_tabbar_icon">
-                <img src="/public/img/icon_nav_cell.png" alt="">
-            </div>
-            <p class="weui_tabbar_label">上一章(无)</p>
-        </a>
-    {{/if}}
-    <a href="javascript:switch_theme();" class="weui_tabbar_item">
-        <div class="weui_tabbar_icon">
-            <img src="/public/img/icon_nav_button.png" alt="">
-        </div>
-        <p class="weui_tabbar_label">日/夜</p>
-    </a>
-    <a href="/catalog/{{book.name}}" class="weui_tabbar_item">
-        <div class="weui_tabbar_icon">
-            <img src="/public/img/icon_nav_article.png" alt="">
-        </div>
-        <p class="weui_tabbar_label">目录</p>
-    </a>
-    <a href="/" class="weui_tabbar_item">
+    <a href="javascript:;" class="weui_tabbar_item">
         <div class="weui_tabbar_icon">
             <img src="/public/img/icon_nav_cell.png" alt="">
         </div>
-        <p class="weui_tabbar_label">书架</p>
+        <p class="weui_tabbar_label">下一章(无)</p>
     </a>
-
-    {{if newer < book.chapters.length}}
-    <a href="/chapter/{{book.name}}/{{newer}}" class="weui_tabbar_item">
-        <div class="weui_tabbar_icon">
-            <img src="/public/img/icon_nav_cell.png" alt="">
-        </div>
-        <p class="weui_tabbar_label">下一章</p>
-    </a>
-    {{else}}
-        <a href="javascript:;" class="weui_tabbar_item">
-            <div class="weui_tabbar_icon">
-                <img src="/public/img/icon_nav_cell.png" alt="">
-            </div>
-            <p class="weui_tabbar_label">下一章(无)</p>
-        </a>    
     {{/if}}
 
-<script>
+    <script>
         let that_bar_body = $(`#bar_body`)
         let that_bar_footer = $(`#bar_footer`)
-    
+
         let page_height = (that_bar_body.height() - that_bar_footer.height()) * 0.98
-    
+
         console.log(`page height is:${page_height}，${that_bar_body.height()}，${that_bar_footer.height()}`)
-    
-        let left_range = [0,window.innerWidth * 0.3]
+
+        let left_range = [0, window.innerWidth * 0.3]
         let middle_range = [window.innerWidth * 0.3 + 1, window.innerWidth * 0.7]
         let right_range = [window.innerWidth * 0.7 + 1, window.innerWidth]
-    
+
         // that_bar_body.click((e)=>
         // {
         //     if(e.clientX < left_range[1])
@@ -107,30 +97,30 @@
         //     }
         // })
 
-        function refetch(book_name,chapter_index)
+        function refetch(book_name, chapter_index)
         {
             $.showLoading()
             $.get({
-                url : `/refetch/${book_name}/${chapter_index}`,
-                success:function(data)
+                url: `/refetch/${book_name}/${chapter_index}`,
+                success: function (data)
                 {
                     $.hideLoading()
-                    if(data.is_ok)
+                    if (data.is_ok)
                     {
                         $("#content").html(data.msg)
                         $.toast("获取成功")
                     }
                     else
                     {
-                        $.toast(data.msg,"cancel")  
+                        $.toast(data.msg, "cancel")
                     }
                 },
-                error: function (e) {
+                error: function (e)
+                {
                     $.hideLoading()
                     $.toast("网络出现状况", "cancel")
-                }            
+                }
             })
         }
-    
-    </script>
-{{/block}}
+
+    </script> {{/block}}

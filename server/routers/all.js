@@ -13,7 +13,8 @@ const md_tasks = server.get("tasks")
 const md_users = server.get("users")
 
 const compresser = compress({
-    filter: function (content_type) {
+    filter: function (content_type)
+    {
         return /text/i.test(content_type)
     },
     threshold: 100,
@@ -23,18 +24,18 @@ const compresser = compress({
 routers.use(helmet.noCache())           //浏览器不要缓存
 routers.use(compresser)
 
-routers.get("/",async(ctx,next)=>
+routers.get("/", async (ctx, next) =>
 {
     let session = ctx.session
     let has_read_something = false
 
-    for(let key in session.reading)
+    for (let key in session.reading)
     {
         has_read_something = true
         break
     }
 
-    if(has_read_something)
+    if (has_read_something)
     {
         ctx.redirect("/books")
     }
@@ -44,7 +45,7 @@ routers.get("/",async(ctx,next)=>
     }
 })
 
-routers.get("/books",async(ctx,next)=>
+routers.get("/books", async (ctx, next) =>
 {
     let info = {}
     let session = ctx.session
@@ -52,40 +53,40 @@ routers.get("/books",async(ctx,next)=>
 
     info.books = {}
 
-    for(let book_name in reading)
+    for (let book_name in reading)
     {
         let read = reading[book_name]
         let book = md_books.get(book_name)
 
         read.time = read.time || 0
 
-        if(book)
+        if (book)
         {
             let chapter = book.chapters[book.chapters.length - 1]
 
             info.books[book_name] = {
-                book : book,
-                chapter : chapter,
-                index : read.chapter,
-                updated : (book.last > read.time)
+                book: book,
+                chapter: chapter,
+                index: read.chapter,
+                updated: (book.last > read.time)
             }
         }
     }
-    
 
-    ctx.render("books",info)
+
+    ctx.render("books", info)
 })
 
-routers.get("/catalog/:book_name",async(ctx,next)=>
+routers.get("/catalog/:book_name", async (ctx, next) =>
 {
     let info = {
-        book : md_books.get(ctx.params.book_name)
+        book: md_books.get(ctx.params.book_name)
     }
 
-    ctx.render("catalog",info)
+    ctx.render("catalog", info)
 })
 
-routers.del("/book",async(ctx,next)=>
+routers.del("/book", async (ctx, next) =>
 {
     let session = ctx.session
 
@@ -93,14 +94,14 @@ routers.del("/book",async(ctx,next)=>
 
     delete session.reading[ctx.request.body.name]
 
-    ctx.body = {is_ok:true}
+    ctx.body = { is_ok: true }
 })
 
-routers.get("/chapter/:book_name/last_read",async(ctx,next)=>
+routers.get("/chapter/:book_name/last_read", async (ctx, next) =>
 {
     let book = md_books.get(ctx.params.book_name)
 
-    if(book == null)
+    if (book == null)
     {
         return
     }
@@ -109,22 +110,22 @@ routers.get("/chapter/:book_name/last_read",async(ctx,next)=>
     let chapter_index = 0
 
     let read_info = session.reading[book.name]
-    if(read_info)
+    if (read_info)
     {
         chapter_index = read_info.chapter
     }
 
-    chapter_index = Math.max(chapter_index,0)
-    chapter_index = Math.min(chapter_index,book.chapters.length - 1)
+    chapter_index = Math.max(chapter_index, 0)
+    chapter_index = Math.min(chapter_index, book.chapters.length - 1)
 
     ctx.redirect(`/chapter/${book.name}/${chapter_index}`)
 })
 
-routers.get("/chapter/:book_name/:chapter_index",async(ctx,next)=>
+routers.get("/chapter/:book_name/:chapter_index", async (ctx, next) =>
 {
     let book = md_books.get(ctx.params.book_name)
 
-    if(book == null)
+    if (book == null)
     {
         return
     }
@@ -132,37 +133,37 @@ routers.get("/chapter/:book_name/:chapter_index",async(ctx,next)=>
     let index = parseInt(ctx.params.chapter_index)
     let chapter = book.chapters[index]
 
-    if(chapter == null)
+    if (chapter == null)
     {
         return
     }
 
-    if(chapter.need_load_content)       //
+    if (chapter.need_load_content)       //
     {
-        await md_books.load_chapter(book,chapter)
+        await md_books.load_chapter(book, chapter)
     }
 
-    if(chapter.content == null)     //也许从来没有拉取过数据,这时候需要重新拉取
+    if (chapter.content == null)     //也许从来没有拉取过数据,这时候需要重新拉取
     {
-        let is_updated = await md_tasks.update_chapter(book,chapter)
-        if(is_updated)
+        let is_updated = await md_tasks.update_chapter(book, chapter)
+        if (is_updated)
         {
-            md_books.update_chapter(book,chapter)       //存入数据库
+            md_books.update_chapter(book, chapter)       //存入数据库
         }
-            
-        md_books.update_chapter(book,chapter)
+
+        md_books.update_chapter(book, chapter)
     }
 
     let info = {
-        book : book,
-        chapter : chapter,
-        index : chapter.index,
+        book: book,
+        chapter: chapter,
+        index: chapter.index,
     }
 
     let session = ctx.session
     let read_info = session.reading[book.name]
 
-    if(read_info == null)
+    if (read_info == null)
     {
         read_info = {}
         session.reading[book.name] = read_info
@@ -173,36 +174,36 @@ routers.get("/chapter/:book_name/:chapter_index",async(ctx,next)=>
 
     md_books.update_last_read(book)
 
-    if(ctx.user)
+    if (ctx.user)
     {
         md_users.update(ctx.user)
     }
 
-    ctx.render("chapter",info)
+    ctx.render("chapter", info)
 })
 
-routers.get("/intro/:book_name",async(ctx,next)=>
+routers.get("/intro/:book_name", async (ctx, next) =>
 {
     let book = md_books.get(ctx.params.book_name)
-    if(book == null)
+    if (book == null)
     {
         return
     }
 
     let info = {
-        book : book,
-        chapter : book.chapters[book.chapters.length - 1],
+        book: book,
+        chapter: book.chapters[book.chapters.length - 1],
     }
 
-    ctx.render("intro",info)
+    ctx.render("intro", info)
 })
 
-routers.get("/logs",async(ctx,next)=>
+routers.get("/logs", async (ctx, next) =>
 {
     ctx.render("logs")
 })
 
-routers.get("/logs/:last_id",async(ctx,next)=>
+routers.get("/logs/:last_id", async (ctx, next) =>
 {
     let max_count = 0
     let last_id = parseInt(ctx.params.last_id)
@@ -214,58 +215,58 @@ routers.get("/logs/:last_id",async(ctx,next)=>
 
     let the_last_index = logs.length - 1
     let start_index = the_last_index
-    if(last_id > 0)
+    if (last_id > 0)
     {
         start_index = the_last_index - (logs[the_last_index].id - last_id) - 1
     }
 
-    for(let stop_index = start_index - 6;start_index >= stop_index && start_index >= 0;start_index--)
+    for (let stop_index = start_index - 6; start_index >= stop_index && start_index >= 0; start_index--)
     {
         info.push(logs[start_index])
     }
 
     // console.dir(info)
 
-    ctx.body = {logs : info}
+    ctx.body = { logs: info }
 })
 
-routers.get("/search",async(ctx,next)=>
+routers.get("/search", async (ctx, next) =>
 {
     let info = {
-        books :md_books.get_all()
+        books: md_books.get_all()
     }
 
-    ctx.render("search",info)
+    ctx.render("search", info)
 })
 
-routers.get("/search/:keyword",async(ctx,next)=>
+routers.get("/search/:keyword", async (ctx, next) =>
 {
     let book_name = ctx.params.keyword
 
     console.log("get a searching task : " + book_name)
 
-    if(md_books.get(book_name))
+    if (md_books.get(book_name))
     {
-        ctx.body = {redirect : `/intro/${book_name}`}
+        ctx.body = { redirect: `/intro/${book_name}` }
 
         return
     }
 
     let book = true
 
-    setImmediate(async()=>
+    setImmediate(async () =>
     {
         //false : another searching
         //null:no such book
-        book = await md_tasks.try_add_book(book_name)       
+        book = await md_tasks.try_add_book(book_name)
     })
 
     // console.log(`time 1:${Date.now()}`)
 
-    for(let i = 0;i < 300;++i)
+    for (let i = 0; i < 300; ++i)
     {
         await server.sleep(10)
-        if(book !== true)
+        if (book !== true)
         {
             // console.log(`break because of time,${i}`)
             break
@@ -274,46 +275,46 @@ routers.get("/search/:keyword",async(ctx,next)=>
 
     // console.log(`time 2:${Date.now()},${typeof(book)},${book}`)
 
-    if(book == null)
+    if (book == null)
     {
         // console.log("no such book 2")
-        ctx.body = {is_ok : true ,msg : "查无此书"}    
+        ctx.body = { is_ok: true, msg: "查无此书" }
         return
     }
 
-    if(book === true)
+    if (book === true)
     {
-        ctx.body = {is_ok : true ,msg : "服务器繁忙，稍后再搜索"}    
+        ctx.body = { is_ok: true, msg: "服务器繁忙，稍后再搜索" }
         return
     }
 
-    ctx.body = {redirect : `/intro/${book_name}`}
+    ctx.body = { redirect: `/intro/${book_name}` }
 })
 
 
-    
+
 const cmds = {}
 
 // get 
 //example:get modules.basic.data.xx
-cmds.get = function(arg)
+cmds.get = function (arg)
 {
     return eval(`(${arg})`)
 }
 
-cmds.set = function()
+cmds.set = function ()
 {
 
 }
 
-routers.post("/debug",async(ctx,next)=>
+routers.post("/debug", async (ctx, next) =>
 {
     let params = ctx.request.body
     let cmd = params.cmd
     let arg = params.arg
     let secret = params.secret
 
-    if(secret != server.secret)
+    if (secret != server.secret)
     {
         return
     }
@@ -323,66 +324,66 @@ routers.post("/debug",async(ctx,next)=>
     try
     {
         let cmd_func = cmds[cmd]
-        if(cmd_func == null)
+        if (cmd_func == null)
         {
-            ctx.body = {result:false,reason:"no such cmd"}
+            ctx.body = { result: false, reason: "no such cmd" }
             return
         }
-    
+
         let result = cmd_func(arg)
-        if(result)
+        if (result)
         {
             console.dir(result)
-            ctx.body = {result:true,data : result}
-            return 
+            ctx.body = { result: true, data: result }
+            return
         }
-    
-        ctx.body = {result:true,data:"no result"}
+
+        ctx.body = { result: true, data: "no result" }
     }
-    catch(err)
+    catch (err)
     {
         console.log(err)
-        ctx.body = {result:false,reason:err}
+        ctx.body = { result: false, reason: err }
     }
 })
 
-routers.get("/refetch/:book_name/:chapter_index",async(ctx,next)=>
+routers.get("/refetch/:book_name/:chapter_index", async (ctx, next) =>
 {
     let book_name = ctx.params.book_name
     let chapter_index = parseInt(ctx.params.chapter_index)
 
     let book = md_books.get(book_name)
-    if(book == null)
+    if (book == null)
     {
-        ctx.body = {is_ok : false,msg : "查无此书"}
+        ctx.body = { is_ok: false, msg: "查无此书" }
         return
     }
 
     let chapter = book.chapters[chapter_index]
 
-    if(chapter == null)
+    if (chapter == null)
     {
-        ctx.body = {is_ok : false,msg : "查无此章节"}
-        return 
-    }
-
-    let is_updated = await md_tasks.update_chapter(book,chapter)
-    if(is_updated == false)
-    {
-        ctx.body = {is_ok : false,msg : "更新失败"}
+        ctx.body = { is_ok: false, msg: "查无此章节" }
         return
     }
-    
+
+    let is_updated = await md_tasks.update_chapter(book, chapter)
+    if (is_updated == false)
+    {
+        ctx.body = { is_ok: false, msg: "更新失败" }
+        return
+    }
+
     chapter.need_load_content = false
 
-    md_books.update_chapter(book,chapter)
+    md_books.update_chapter(book, chapter)
 
-    ctx.body = {is_ok : true,msg : chapter.content}
+    ctx.body = { is_ok: true, msg: chapter.content }
 })
 
-routers.get("/me",async(ctx,next)=>
+routers.get("/me", async (ctx, next) =>
 {
-    if(ctx.user == null)
+    if (ctx.user == null)
     {
         ctx.redirect("/login")
         return
@@ -391,14 +392,14 @@ routers.get("/me",async(ctx,next)=>
     ctx.render("me")
 })
 
-routers.get("/about",async(ctx,next)=>
+routers.get("/about", async (ctx, next) =>
 {
     ctx.render("about")
 })
 
-routers.get("/login",async(ctx,next)=>
+routers.get("/login", async (ctx, next) =>
 {
-    if(ctx.user)
+    if (ctx.user)
     {
         ctx.redirect("/")
         return
@@ -407,9 +408,9 @@ routers.get("/login",async(ctx,next)=>
     ctx.render("login")
 })
 
-routers.post("/login",async(ctx,next)=>
+routers.post("/login", async (ctx, next) =>
 {
-    if(ctx.user)
+    if (ctx.user)
     {
         ctx.redirect("/books")
         return
@@ -425,15 +426,15 @@ routers.post("/login",async(ctx,next)=>
     let trans_pass = md5.update(pass).digest('hex');
 
     let user = md_users.get_by_mail(mail)
-    if(user == null)
+    if (user == null)
     {
-        user = await md_users.new(mail,trans_pass)
+        user = await md_users.new(mail, trans_pass)
     }
     else
     {
-        if(user.pass != trans_pass)
+        if (user.pass != trans_pass)
         {
-            ctx.body = {is_ok : false,msg : "密码错误"}
+            ctx.body = { is_ok: false, msg: "密码错误" }
             return
         }
     }
@@ -442,33 +443,33 @@ routers.post("/login",async(ctx,next)=>
 
     //合并一次书架
     let should_save = false
-    for(let book_name in ctx.session.reading)
+    for (let book_name in ctx.session.reading)
     {
         let read_info = ctx.session.reading[book_name]
         let exist = user.reading[book_name]
 
         should_save = true
 
-        if(exist == null)
+        if (exist == null)
         {
-            exist = {chapter : read_info.chapter,time : read_info.time}
+            exist = { chapter: read_info.chapter, time: read_info.time }
             user.reading[book_name] = exist
         }
         else
         {
-            exist.chapter = Math.max(exist.chapter,read_indo.chapter)
-            exist.time = Math.max(exist.time,read_indo.time)
+            exist.chapter = Math.max(exist.chapter, read_info.chapter)
+            exist.time = Math.max(exist.time, read_info.time)
         }
     }
 
-    if(should_save)
+    if (should_save)
     {
         console.log("合并书架")
         console.dir(user)
         md_users.update(user)
     }
 
-    ctx.body = {is_ok : true,redirect : "/"}
+    ctx.body = { is_ok: true, redirect: "/" }
 })
 
 
