@@ -7,17 +7,15 @@ const server = global.server
 const app = server.app
 const routers = server.routers
 
-console.log("-----------------------routers")
-
-routers.use(async (ctx,next)=>
+routers.use(async (ctx, next) =>
 {
     console.log(`Process ${ctx.req.method} ${ctx.req.url}`);
     // console.dir(ctx.request.headers)
-        
+
     await next()
 })
 
-routers.use(async(ctx,next)=>
+routers.use(async (ctx, next) =>
 {
     ctx.state = server.data
 
@@ -27,12 +25,12 @@ routers.use(async(ctx,next)=>
 routers.use(convert(limit({
     limit: 1000,
     interval: 1000 * 60
-  })))
+})))
 
 
-routers.use(helmet.noSniff())           
-routers.use(helmet.frameguard())         
-routers.use(helmet.xssFilter())         
+routers.use(helmet.noSniff())
+routers.use(helmet.frameguard())
+routers.use(helmet.xssFilter())
 routers.use(helmet.hidePoweredBy())     //      删除了 header 中的 X-Powered-By 标签
 routers.use(helmet.ieNoOpen())
 

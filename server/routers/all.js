@@ -4,7 +4,6 @@ const crypto = require('crypto');
 const assert = require("assert")
 
 const server = global.server
-const app = server.app
 const routers = server.routers
 
 const md_books = server.get("books")
@@ -26,10 +25,10 @@ routers.use(compresser)
 
 routers.get("/", async (ctx, next) =>
 {
-    let session = ctx.session
+    let user = ctx.user
     let has_read_something = false
 
-    for (let key in session.reading)
+    for (let _ in user.reading)
     {
         has_read_something = true
         break
@@ -47,11 +46,10 @@ routers.get("/", async (ctx, next) =>
 
 routers.get("/books", async (ctx, next) =>
 {
-    let info = {}
-    let session = ctx.session
-    let reading = session.reading
+    let user = ctx.user
+    let reading = user.reading
 
-    info.books = {}
+    let info = { books: {}, user: user }
 
     for (let book_name in reading)
     {
@@ -80,6 +78,7 @@ routers.get("/books", async (ctx, next) =>
 routers.get("/catalog/:book_name", async (ctx, next) =>
 {
     let info = {
+        user: ctx.user,
         book: md_books.get(ctx.params.book_name)
     }
 
@@ -88,11 +87,13 @@ routers.get("/catalog/:book_name", async (ctx, next) =>
 
 routers.del("/book", async (ctx, next) =>
 {
-    let session = ctx.session
+    let user = ctx.user
 
     console.log(`delete my books ${ctx.request.body.name}`)
 
-    delete session.reading[ctx.request.body.name]
+    delete user.reading[ctx.request.body.name]
+
+    md_users.update(user)
 
     ctx.body = { is_ok: true }
 })
@@ -106,10 +107,10 @@ routers.get("/chapter/:book_name/last_read", async (ctx, next) =>
         return
     }
 
-    let session = ctx.session
+    let user = ctx.user
     let chapter_index = 0
 
-    let read_info = session.reading[book.name]
+    let read_info = user.reading[book.name]
     if (read_info)
     {
         chapter_index = read_info.chapter
@@ -158,15 +159,16 @@ routers.get("/chapter/:book_name/:chapter_index", async (ctx, next) =>
         book: book,
         chapter: chapter,
         index: chapter.index,
+        user: ctx.user,
     }
 
-    let session = ctx.session
-    let read_info = session.reading[book.name]
+    let user = ctx.user
+    let read_info = user.reading[book.name]
 
     if (read_info == null)
     {
         read_info = {}
-        session.reading[book.name] = read_info
+        user.reading[book.name] = read_info
     }
 
     read_info.chapter = index
@@ -174,10 +176,7 @@ routers.get("/chapter/:book_name/:chapter_index", async (ctx, next) =>
 
     md_books.update_last_read(book)
 
-    if (ctx.user)
-    {
-        md_users.update(ctx.user)
-    }
+    md_users.update(user)
 
     ctx.render("chapter", info)
 })
@@ -191,6 +190,7 @@ routers.get("/intro/:book_name", async (ctx, next) =>
     }
 
     let info = {
+        user: ctx.user,
         book: book,
         chapter: book.chapters[book.chapters.length - 1],
     }
@@ -200,7 +200,9 @@ routers.get("/intro/:book_name", async (ctx, next) =>
 
 routers.get("/logs", async (ctx, next) =>
 {
-    ctx.render("logs")
+    ctx.render("logs", {
+        user: ctx.user,
+    })
 })
 
 routers.get("/logs/:last_id", async (ctx, next) =>
@@ -233,7 +235,8 @@ routers.get("/logs/:last_id", async (ctx, next) =>
 routers.get("/search", async (ctx, next) =>
 {
     let info = {
-        books: md_books.get_all()
+        books: md_books.get_all(),
+        user: ctx.user,
     }
 
     ctx.render("search", info)
@@ -383,39 +386,48 @@ routers.get("/refetch/:book_name/:chapter_index", async (ctx, next) =>
 
 routers.get("/me", async (ctx, next) =>
 {
-    if (ctx.user == null)
+    let user = ctx.user
+    if (user.is_temp === true)
     {
         ctx.redirect("/login")
         return
     }
 
-    ctx.render("me")
+    ctx.render("me", {
+        user: ctx.user,
+    })
 })
 
 routers.get("/about", async (ctx, next) =>
 {
-    ctx.render("about")
+    ctx.render("about", {
+        user: ctx.user,
+    })
 })
 
 routers.get("/login", async (ctx, next) =>
 {
-    if (ctx.user)
+    let user = ctx.user
+    if (user.is_temp !== true)
     {
         ctx.redirect("/")
         return
     }
 
-    ctx.render("login")
+    ctx.render("login", {
+        user: ctx.user,
+    })
 })
 
 routers.post("/login", async (ctx, next) =>
 {
-    if (ctx.user)
+    if (ctx.user.is_temp !== true)
     {
         ctx.redirect("/books")
         return
     }
 
+    //非正式玩家
     let mail = ctx.request.body.mail.toLowerCase()
     let pass = ctx.request.body.password
 
@@ -426,29 +438,31 @@ routers.post("/login", async (ctx, next) =>
     let trans_pass = md5.update(pass).digest('hex');
 
     let user = md_users.get_by_mail(mail)
-    if (user == null)
+    if (user == null)   //注册
     {
-        user = await md_users.new(mail, trans_pass)
-    }
-    else
-    {
-        if (user.pass != trans_pass)
-        {
-            ctx.body = { is_ok: false, msg: "密码错误" }
-            return
-        }
+        user = ctx.user
+
+        user.mail = mail
+        user.pass = trans_pass
+
+        md_users.temp_to_regular(user)
+
+        ctx.body = { is_ok: true, redirect: "/" }
+
+        return
     }
 
-    ctx.session.user_id = user.id
+    if (user.pass != trans_pass)
+    {
+        ctx.body = { is_ok: false, msg: "密码错误" }
+        return
+    }
 
     //合并一次书架
-    let should_save = false
-    for (let book_name in ctx.session.reading)
+    for (let book_name in ctx.user.reading)
     {
-        let read_info = ctx.session.reading[book_name]
+        let read_info = ctx.user.reading[book_name]
         let exist = user.reading[book_name]
-
-        should_save = true
 
         if (exist == null)
         {
@@ -462,12 +476,9 @@ routers.post("/login", async (ctx, next) =>
         }
     }
 
-    if (should_save)
-    {
-        console.log("合并书架")
-        console.dir(user)
-        md_users.update(user)
-    }
+    ctx.session.user_id = user.id
+
+    md_users.update(user)
 
     ctx.body = { is_ok: true, redirect: "/" }
 })

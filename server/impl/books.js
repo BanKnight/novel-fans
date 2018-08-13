@@ -10,7 +10,8 @@ const md_logs = server.get("logs")
 const me = server.get("books")
 const data = me.data
 
-me.start = async () => {
+me.start = async () =>
+{
     let db_data = await md_db.load("basic")
 
     for (let i = 0, len = db_data.length; i < len; ++i) 
@@ -24,7 +25,7 @@ me.start = async () => {
             url: db_one_data.url,
             create: db_one_data.create || Date.now(),
             last: db_one_data.last || Date.now(),
-            last_read : db_one_data.last || 0,
+            last_read: db_one_data.last || 0,
             chapters: [],
         }
 
@@ -37,7 +38,7 @@ me.start = async () => {
 
     await md_db.index("chapter", { book: 1, index: 1 })   //设置索引
 
-    db_data = await md_db.load("chapter",{},{content : 0})     //内容字段先不加载
+    db_data = await md_db.load("chapter", {}, { content: 0 })     //内容字段先不加载
 
     for (let i = 0, len = db_data.length; i < len; ++i) 
     {
@@ -60,7 +61,8 @@ me.start = async () => {
         book.chapters.push(chapter)
     }
 
-    for (let book_name in data) {
+    for (let book_name in data)
+    {
         let book = data[book_name]
 
         book.chapters.sort(me.chapter_cmp)
@@ -73,7 +75,8 @@ me.start = async () => {
     return true
 }
 
-me.chapter_cmp = (first, second) => {
+me.chapter_cmp = (first, second) =>
+{
     return first.index - second.index
 }
 
@@ -97,7 +100,8 @@ me.check_update = async () =>
     }
 }
 
-me.add = (book) => {
+me.add = (book) =>
+{
     assert(data[book.name] == null)
 
     data[book.name] = book
@@ -124,8 +128,8 @@ me.add = (book) => {
         const db = {
             name: chapter.name,
             site: chapter.site,
-            content : chapter.content,
-            url : chapter.url,
+            content: chapter.content,
+            url: chapter.url,
         }
 
         chapter.need_save = null
@@ -145,7 +149,8 @@ me.update = (book) =>
     for (let last = book.chapters.length - 1, first = 0; last >= first; --last) 
     {
         let chapter = book.chapters[last]
-        if (chapter == null) {
+        if (chapter == null)
+        {
             continue
         }
 
@@ -164,30 +169,31 @@ me.update = (book) =>
 
             md_db.upsert("chapter", { book: book.name, index: chapter.index }, db)
         }
-        else {
+        else
+        {
             break
         }
     }
 
     book.last = Date.now()      //上次更新的时间
 
-    md_db.upsert("basic", { _id: book.name }, { last: book.last,url : book.url})
+    md_db.upsert("basic", { _id: book.name }, { last: book.last, url: book.url })
 
     md_logs.add(`${book.name} update:${update_count} chapters`)
 }
 
-me.update_last_read = (book)=>
+me.update_last_read = (book) =>
 {
     book.last_read = Date.now()
 
-    md_db.upsert("basic", { _id: book.name }, { last_read: book.last_read,url : book.url})
+    md_db.upsert("basic", { _id: book.name }, { last_read: book.last_read, url: book.url })
 }
 
-me.load_chapter = async(book,chapter)=>
+me.load_chapter = async (book, chapter) =>
 {
-    let db_data = await md_db.load("chapter", { book: book.name, index: chapter.index },{content : 1})
+    let db_data = await md_db.load("chapter", { book: book.name, index: chapter.index }, { content: 1 })
 
-    if(db_data.length == 0)
+    if (db_data.length == 0)
     {
         return
     }
@@ -197,13 +203,13 @@ me.load_chapter = async(book,chapter)=>
 
     md_logs.add(`${book.name} load chapter:${chapter.name}`)
 
-    if(chapter.timer)
+    if (chapter.timer)
     {
         return
     }
 
     //两天后卸掉正文，保持内存比较少
-    chapter.timer = server.run_after(2 * 24 * 3600 * 1000,()=>
+    chapter.timer = server.run_after(2 * 24 * 3600 * 1000, () =>
     {
         chapter.timer = null
         chapter.content = null
@@ -230,10 +236,12 @@ me.update_chapter = function (book, chapter)
     md_db.upsert("chapter", { book: book.name, index: chapter.index }, db)
 }
 
-me.get = function (name) {
+me.get = function (name)
+{
     return data[name]
 }
 
-me.get_all = function (name) {
+me.get_all = function (name)
+{
     return data
 }
