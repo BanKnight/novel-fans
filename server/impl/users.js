@@ -19,7 +19,7 @@ me.start = async function ()
             pass: db_one.pass,
             regist: db_one.regist,
             reading: db_one.reading || {},
-            is_temp: db_one.is_temp,
+            is_temp: db_one.is_temp || false,
         }
 
         data.pid_users[user.id] = user
