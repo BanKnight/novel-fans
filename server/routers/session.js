@@ -1,5 +1,4 @@
 const session = require("koa-session-minimal")
-
 const server = global.server
 const routers = server.routers
 

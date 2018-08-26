@@ -19,6 +19,7 @@ me.start = async function ()
             pass: db_one.pass,
             regist: db_one.regist,
             reading: db_one.reading || {},
+            token: db_one.token,
             is_temp: db_one.is_temp || false,
         }
 
@@ -116,10 +117,18 @@ me.temp_to_regular = async function (user)
     })
 }
 
-me.update = async function (user)
+me.update_book = async function (user)
 {
     await md_db.upsert("users", { _id: user.id }, {
         reading: user.reading,
     })
-
+}
+me.update = async function (user)
+{
+    await md_db.upsert("users", { _id: user.id }, {
+        mail: user.mail,
+        pass: user.pass,
+        token: user.token,
+        is_temp: false,
+    })
 }

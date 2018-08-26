@@ -2,6 +2,7 @@ const helmet = require('koa-helmet')
 const compress = require('koa-compress')
 const crypto = require('crypto');
 const assert = require("assert")
+const uid = require("uid-safe")
 
 const server = global.server
 const routers = server.routers
@@ -10,6 +11,7 @@ const md_books = server.get("books")
 const md_logs = server.get("logs")
 const md_tasks = server.get("tasks")
 const md_users = server.get("users")
+const md_mail = server.get("mail")
 
 const compresser = compress({
     filter: function (content_type)
@@ -93,7 +95,7 @@ routers.del("/book", async (ctx, next) =>
 
     delete user.reading[ctx.request.body.name]
 
-    md_users.update(user)
+    md_users.update_book(user)
 
     ctx.body = { is_ok: true }
 })
@@ -176,7 +178,7 @@ routers.get("/chapter/:book_name/:chapter_index", async (ctx, next) =>
 
     md_books.update_last_read(book)
 
-    md_users.update(user)
+    md_users.update_book(user)
 
     ctx.render("chapter", info)
 })
@@ -435,7 +437,7 @@ routers.post("/login", async (ctx, next) =>
     assert(pass.length > 0)
 
     const md5 = crypto.createHash('md5')
-    let trans_pass = md5.update(pass).digest('hex');
+    const trans_pass = md5.update(pass).digest('hex');
 
     let user = md_users.get_by_mail(mail)
     if (user == null)   //注册
@@ -478,6 +480,110 @@ routers.post("/login", async (ctx, next) =>
 
     ctx.session.user_id = user.id
 
+    md_users.update_book(user)
+
+    ctx.body = { is_ok: true, redirect: "/" }
+})
+
+routers.get("/forget/:mail", async (ctx) =>
+{
+    let mail = ctx.params.mail.toLowerCase()
+
+    let user = md_users.get_by_mail(mail)
+
+    if (user == null)
+    {
+        ctx.body = { is_ok: false, msg: "查无此用户" }
+        return
+    }
+
+    // check ctx.request.domain
+
+
+    user.token = uid.sync(24)
+
+    md_users.update(user)       //保存token
+
+    ctx.body = { is_ok: true, msg: "已经发到你的邮件" }
+
+    let url = `${ctx.request.origin}/change/${mail}/${user.token}`
+
+    md_mail.send_html(mail, "修改密码", `<a href="${url}">点击跳转修改密码</a>`)
+
+    //Todo send mail
+})
+
+routers.get("/change/:mail/:token", async (ctx) =>
+{
+    let mail = ctx.params.mail.toLowerCase()
+    let token = ctx.params.token.toLowerCase()
+
+    //check mail and token
+    let user = md_users.get_by_mail(mail)
+    if (user == null)
+    {
+        ctx.status = 404
+        return
+    }
+
+    if (user.token.toLowerCase() != token)    //超时
+    {
+        ctx.redirect("/")
+        return
+    }
+
+    ctx.session.forgeting = {
+        mail: mail,
+        token: token
+    }
+
+    ctx.render("change_password")
+})
+
+routers.post("/change", async (ctx) =>
+{
+    if (!ctx.session.forgeting)
+    {
+        return
+    }
+
+    let mail = ctx.session.forgeting.mail
+    let pass = ctx.request.body.password
+
+    assert(pass.length > 0)
+
+    const md5 = crypto.createHash('md5')
+    const trans_pass = md5.update(pass).digest('hex');
+
+    let user = md_users.get_by_mail(mail)
+
+    user.pass = trans_pass
+
+    //合并一次书架
+    for (let book_name in ctx.user.reading)
+    {
+        let read_info = ctx.user.reading[book_name]
+        let exist = user.reading[book_name]
+
+        if (exist == null)
+        {
+            exist = { chapter: read_info.chapter, time: read_info.time }
+            user.reading[book_name] = exist
+        }
+        else
+        {
+            exist.chapter = Math.max(exist.chapter, read_info.chapter)
+            exist.time = Math.max(exist.time, read_info.time)
+        }
+    }
+
+    ctx.session.user_id = user.id
+
+    delete ctx.session.forgeting
+
+    delete user.token
+
+    md_users.update_book(user)
     md_users.update(user)
 
     ctx.body = { is_ok: true, redirect: "/" }
