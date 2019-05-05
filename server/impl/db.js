@@ -1,5 +1,6 @@
-const mongo = require("mongodb")
-const assert = require("assert")
+const Nedb = require('nedb')
+const path = require("path")
+const fs = require("fs")
 
 const config = global.config
 const server = global.server
@@ -8,108 +9,137 @@ const me = server.get("db")
 
 const data = me.data
 
-me.start = async function()
+me.start = async function ()
 {
-    const connect_str = `mongodb://${config.db.host}:${config.db.port}`
-
     try
     {
-        const client = await mongo.connect(connect_str)
-
-        data.db = client.db(config.db.db)
-
-        console.log(`connect ${connect_str}:${config.db.db} ok`)
+        fs.mkdirSync(path.resolve(config.db))
     }
-    catch(err)
+    catch (err)
     {
-        console.log(err)
-
-        return false
     }
 }
 
-me.load = async(name,cond,fields)=>
+me.get_col = function (name)
 {
-    try
+    let col = data[name]
+    if (col)
     {
-        assert(data.db)
-
-        cond = cond || {}
-        fields = fields || {}
-
-        const col = data.db.collection(name)
-        const ret = await col.find(cond).toArray()
-
-        /*
-            const cursor = col.find({a:1}).limit(2);
-
-            while(await cursor.hasNext()) {
-            const doc = await cursor.next();
-            console.dir(doc);
-        */
-
-        return ret
+        return col
     }
-    catch(err)
-    {
-        console.log(err)
-    }
+
+    col = new Nedb({ filename: path.resolve(config.db, `${name}.col`), autoload: true })
+
+    data[name] = col
+
+    return col
 }
 
-me.upsert = async(name,cond,db_data)=>
-{
-    try
-    {
-        const col = data.db.collection(name)
+const empty = {}
 
-        const r = await col.updateOne(cond, {$set: db_data}, {upsert: true})
-    
-        //assert.equal(1, r.upsertedCount)
-    }
-    catch(err)
+me.load = function (name, cond)
+{
+    let col = me.get_col(name)
+
+    cond = cond || empty
+
+    return new Promise(function (resolve, reject)
     {
-        console.log(err);
-    }
+        col.find(cond, function (err, docs)
+        {
+            if (err)
+            {
+                reject(err)
+            }
+            else
+            {
+                resolve(docs)
+            }
+        })
+    })
+
 }
 
-me.index = async(name,field)=>
+/**
+ * db_data 不能带_id
+ */
+me.upsert = function (name, cond, db_data)
 {
-    try
-    {
-        const col = data.db.collection(name)
+    const col = me.get_col(name)
 
-        const r = await col.createIndex(field,{unique : true})
-    }
-    catch(err)
+    return new Promise(function (resolve, reject)
     {
-        console.log(err)
-    }
+        col.update(cond, { $set: db_data }, { upsert: true }, function (err)
+        {
+            if (err)
+            {
+                reject(err)
+            }
+            else
+            {
+                resolve()
+            }
+        })
+    })
+
 }
 
-me.remove = async(name,cond)=>
+me.index = function (name, field)
 {
-    try
-    {
-        const col = data.db.collection(name)
+    const col = me.get_col(name)
 
-        const r = await col.deleteOne(cond)    
-    }
-    catch(err)
+    return new Promise(function (resolve, reject)
     {
-        console.log(err)
-    }
+        col.ensureIndex({ fieldName: field, unique: true }, function (err)
+        {
+            if (err)
+            {
+                reject(err)
+            }
+            else
+            {
+                resolve()
+            }
+        });
+    })
 }
 
-me.remove_many = async(name,cond)=>
+me.remove = function (name, cond)
 {
-    try
-    {
-        const col = data.db.collection(name)
+    const col = me.get_col(name)
 
-        const r = await col.deleteMany(cond)    
-    }
-    catch(err)
+    return new Promise(function (resolve, reject)
     {
-        console.log(err)
-    }
+        col.remove(cond, {}, function (err, numRemoved) 
+        {
+            if (err)
+            {
+                reject(err)
+            }
+            else
+            {
+                resolve()
+            }
+        });
+    })
+}
+
+me.remove_many = async (name, cond) =>
+{
+    const col = me.get_col(name)
+
+    return new Promise(function (resolve, reject)
+    {
+        col.remove(cond, { multi: true }, function (err, numRemoved) 
+        {
+            if (err)
+            {
+                reject(err)
+            }
+            else
+            {
+                resolve()
+            }
+        })
+    })
 }

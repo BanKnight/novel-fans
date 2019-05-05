@@ -36,9 +36,9 @@ me.start = async () =>
 
     console.log(`has ready load ${db_data.length} books`)
 
-    await md_db.index("chapter", { book: 1, index: 1 })   //设置索引
+    // await md_db.index("chapter", { book: 1, index: 1 })   //设置索引
 
-    db_data = await md_db.load("chapter", {}, { content: 0 })     //内容字段先不加载
+    db_data = await md_db.load("chapter", {})
 
     for (let i = 0, len = db_data.length; i < len; ++i) 
     {

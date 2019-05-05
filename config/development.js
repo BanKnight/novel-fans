@@ -1,10 +1,10 @@
 module.exports = {
-    web_name : "周周读",
-    web_description:"一个专为方便朋友看小说的网站",
-    site : "http://novel.mustbe.cool",
-    port:80,
-    content:"./content",
-    theme:"fansy",
-    db:{host:"127.0.0.1",port:27017,db:"novel"}, //数据链接信息
-    logs : {max : 100,}
+    web_name: "周周读",
+    web_description: "一个专为方便朋友看小说的网站",
+    site: "http://novel.mustbe.cool",
+    port: 80,
+    content: "./content",
+    theme: "fansy",
+    db: "./data",
+    logs: { max: 100, }
 }
