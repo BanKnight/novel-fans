@@ -1,8 +1,9 @@
 let md_info = {
-    data : {
-        pid_users : {},
-        mail_users : {},
-        id_helper : 0,
+    data: {
+        pid_users: {},
+        mail_users: {},
+        temp_id_helper: 0,
+        regular_id_helper: 0,
     },
 }
 

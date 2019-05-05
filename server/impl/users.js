@@ -27,10 +27,16 @@ me.start = async function ()
         if (user.is_temp === false)
         {
             data.mail_users[user.mail] = user
-        }
 
-        data.id_helper = Math.max(data.id_helper, user.id)
+            data.regular_id_helper = Math.max(data.regular_id_helper, user.id)
+        }
+        else
+        {
+            data.temp_id_helper = Math.max(data.temp_id_helper, user.id)
+        }
     }
+
+    data.temp_id_helper = Math.max(data.temp_id_helper, Date.now())
 
     return true
 }
@@ -47,7 +53,20 @@ me.set = function (id, val)
 
 me.destroy = function (id)
 {
+    let user = data.pid_users[id]
+    if (user == null)
+    {
+        return
+    }
+
     delete data.pid_users[id]
+
+    if (user.is_temp == false)
+    {
+        delete user.mail_users[user.mail]
+    }
+
+    md_db.remove("users", { _id: user.id })
 }
 
 me.get_by_mail = function (mail)
@@ -55,10 +74,10 @@ me.get_by_mail = function (mail)
     return data.mail_users[mail]
 }
 
-me.new = async function (mail, pass)
+me.new = function (mail, pass)
 {
     let user = {
-        id: ++data.id_helper,
+        id: ++data.regular_id_helper,
         mail: mail,
         pass: pass,
         regist: Date.now(),
@@ -68,7 +87,7 @@ me.new = async function (mail, pass)
     data.pid_users[user.id] = user
     data.mail_users[user.mail] = user
 
-    await md_db.upsert("users", { _id: user.id }, {
+    md_db.upsert("users", { _id: user.id }, {
         mail: mail,
         pass: pass,
         regist: user.regist,
@@ -78,10 +97,10 @@ me.new = async function (mail, pass)
     return user
 }
 
-me.new_temp_user = async function ()
+me.new_temp_user = function ()
 {
     let user = {
-        id: ++data.id_helper,
+        id: ++data.temp_id_helper,
         mail: "",
         pass: "",
         regist: Date.now(),
@@ -92,7 +111,7 @@ me.new_temp_user = async function ()
     data.pid_users[user.id] = user
     // data.mail_users[user.mail] = user
 
-    await md_db.upsert("users", { _id: user.id }, {
+    md_db.upsert("users", { _id: user.id }, {
         mail: user.mail,
         pass: user.pass,
         regist: user.regist,
@@ -103,29 +122,34 @@ me.new_temp_user = async function ()
     return user
 }
 
-me.temp_to_regular = async function (user)
+me.temp_to_regular = function (user)
 {
+    me.destroy(user.id)
+
+    user.id = ++data.regular_id_helper
     user.is_temp = false
 
+    data.pid_users[user.id] = user
     data.mail_users[user.mail] = user
 
-    await md_db.upsert("users", { _id: user.id }, {
+    md_db.upsert("users", { _id: user.id }, {
         mail: user.mail,
         pass: user.pass,
         is_temp: false,
+        regist: user.regist,
         reading: user.reading,
     })
 }
 
-me.update_book = async function (user)
+me.update_book = function (user)
 {
-    await md_db.upsert("users", { _id: user.id }, {
+    md_db.upsert("users", { _id: user.id }, {
         reading: user.reading,
     })
 }
-me.update = async function (user)
+me.update = function (user)
 {
-    await md_db.upsert("users", { _id: user.id }, {
+    md_db.upsert("users", { _id: user.id }, {
         mail: user.mail,
         pass: user.pass,
         token: user.token,

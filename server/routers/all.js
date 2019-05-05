@@ -440,6 +440,8 @@ routers.post("/login", async (ctx, next) =>
 
         md_users.temp_to_regular(user)
 
+        ctx.session.user_id = user.id
+
         ctx.body = { is_ok: true, redirect: "/" }
 
         return
@@ -471,6 +473,7 @@ routers.post("/login", async (ctx, next) =>
 
     ctx.session.user_id = user.id
 
+    md_users.destroy(ctx.user.id)       //删除旧的
     md_users.update_book(user)
 
     ctx.body = { is_ok: true, redirect: "/" }

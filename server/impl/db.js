@@ -30,7 +30,8 @@ me.get_col = function (name)
 
     col = new Nedb({ filename: path.resolve(config.db, `${name}.col`), autoload: true })
 
-    col.persistence.setAutocompactionInterval(1000 * 2 * 4)      //8 hours
+    col.persistence.compactDatafile()
+    col.persistence.setAutocompactionInterval(1000 * 3600 * 4)      //8 hours
 
     data[name] = col
 
