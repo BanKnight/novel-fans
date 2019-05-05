@@ -141,11 +141,6 @@ routers.get("/chapter/:book_name/:chapter_index", async (ctx, next) =>
         return
     }
 
-    if (chapter.need_load_content)       //
-    {
-        await md_books.load_chapter(book, chapter)
-    }
-
     if (chapter.content == null)     //也许从来没有拉取过数据,这时候需要重新拉取
     {
         let is_updated = await md_tasks.update_chapter(book, chapter)
@@ -153,8 +148,6 @@ routers.get("/chapter/:book_name/:chapter_index", async (ctx, next) =>
         {
             md_books.update_chapter(book, chapter)       //存入数据库
         }
-
-        md_books.update_chapter(book, chapter)
     }
 
     let info = {
@@ -378,8 +371,6 @@ routers.get("/refetch/:book_name/:chapter_index", async (ctx, next) =>
         ctx.body = { is_ok: false, msg: "更新失败" }
         return
     }
-
-    chapter.need_load_content = false
 
     md_books.update_chapter(book, chapter)
 

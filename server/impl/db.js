@@ -30,6 +30,8 @@ me.get_col = function (name)
 
     col = new Nedb({ filename: path.resolve(config.db, `${name}.col`), autoload: true })
 
+    col.persistence.setAutocompactionInterval(1000 * 2 * 4)      //8 hours
+
     data[name] = col
 
     return col
@@ -67,20 +69,7 @@ me.upsert = function (name, cond, db_data)
 {
     const col = me.get_col(name)
 
-    return new Promise(function (resolve, reject)
-    {
-        col.update(cond, { $set: db_data }, { upsert: true }, function (err)
-        {
-            if (err)
-            {
-                reject(err)
-            }
-            else
-            {
-                resolve()
-            }
-        })
-    })
+    col.update(cond, { $set: db_data }, { upsert: true })
 
 }
 
@@ -88,58 +77,20 @@ me.index = function (name, field)
 {
     const col = me.get_col(name)
 
-    return new Promise(function (resolve, reject)
-    {
-        col.ensureIndex({ fieldName: field, unique: true }, function (err)
-        {
-            if (err)
-            {
-                reject(err)
-            }
-            else
-            {
-                resolve()
-            }
-        });
-    })
+    col.ensureIndex({ fieldName: field, unique: true })
 }
 
 me.remove = function (name, cond)
 {
     const col = me.get_col(name)
 
-    return new Promise(function (resolve, reject)
-    {
-        col.remove(cond, {}, function (err, numRemoved) 
-        {
-            if (err)
-            {
-                reject(err)
-            }
-            else
-            {
-                resolve()
-            }
-        });
-    })
+    col.remove(cond, {})
 }
 
 me.remove_many = async (name, cond) =>
 {
     const col = me.get_col(name)
 
-    return new Promise(function (resolve, reject)
-    {
-        col.remove(cond, { multi: true }, function (err, numRemoved) 
-        {
-            if (err)
-            {
-                reject(err)
-            }
-            else
-            {
-                resolve()
-            }
-        })
-    })
+    col.remove(cond, { multi: true })
+
 }

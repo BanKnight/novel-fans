@@ -54,9 +54,8 @@ me.start = async () =>
             book: db_one_data.book,
             index: db_one_data.index,      //从1开始
             name: db_one_data.name,
+            content: db_one_data.content,
         }
-
-        chapter.need_load_content = true        //
 
         book.chapters.push(chapter)
     }
@@ -187,34 +186,6 @@ me.update_last_read = (book) =>
     book.last_read = Date.now()
 
     md_db.upsert("basic", { _id: book.name }, { last_read: book.last_read, url: book.url })
-}
-
-me.load_chapter = async (book, chapter) =>
-{
-    let db_data = await md_db.load("chapter", { book: book.name, index: chapter.index }, { content: 1 })
-
-    if (db_data.length == 0)
-    {
-        return
-    }
-
-    chapter.content = db_data[0].content
-    chapter.need_load_content = false
-
-    md_logs.add(`${book.name} load chapter:${chapter.name}`)
-
-    if (chapter.timer)
-    {
-        return
-    }
-
-    //两天后卸掉正文，保持内存比较少
-    chapter.timer = server.run_after(2 * 24 * 3600 * 1000, () =>
-    {
-        chapter.timer = null
-        chapter.content = null
-        chapter.need_load_content = true
-    })
 }
 
 me.update_chapter = function (book, chapter)
