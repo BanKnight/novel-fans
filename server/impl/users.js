@@ -10,9 +10,27 @@ me.start = async function ()
 {
     let db_data = await md_db.load("users")
 
+    let wait_delete = []
+
+    function is_empty(obj)
+    {
+        for (let key in obj)
+        {
+            return false
+        }
+        return true
+    }
+
     for (let i = 0, len = db_data.length; i < len; ++i)
     {
         let db_one = db_data[i]
+
+        if (db_one.is_temp == true && is_empty(db_one.reading) == true)
+        {
+            wait_delete.push(db_one._id)
+            continue
+        }
+
         let user = {
             id: db_one._id,
             mail: db_one.mail,
@@ -37,6 +55,11 @@ me.start = async function ()
     }
 
     data.temp_id_helper = Math.max(data.temp_id_helper, Date.now())
+
+    for (let id of wait_delete)
+    {
+        md_db.remove("users", { _id: id })
+    }
 
     return true
 }
