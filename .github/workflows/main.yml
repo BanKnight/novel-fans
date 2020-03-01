@@ -2,8 +2,8 @@ name: CI
 
 on:
   push:
-    tags:
-      - '**'
+    - master
+
 jobs:
   server:
     runs-on: ubuntu-latest
